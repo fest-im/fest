@@ -1,0 +1,14 @@
+[package]
+authors = ["Jonas Platte <mail@jonasplatte.de>"]
+name = "ruma-gtk"
+version = "0.1.0"
+
+[dependencies]
+#xdg = "2.0.0"
+
+[dependencies.gtk]
+version = "0.1.1"
+features = ["v3_10"]
+
+[dependencies.ruma-client-api]
+git = "https://github.com/ruma/ruma-client-api"
