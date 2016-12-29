@@ -149,7 +149,7 @@
                           <object class="GtkImage">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="icon_name">system-run</property>
+                            <property name="icon_name">preferences-system</property>
                           </object>
                         </child>
                       </object>
@@ -194,9 +194,10 @@
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkStackSwitcher">
+                  <object class="GtkStackSwitcher" id="room_sidebar_stack_switcher">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="stack">room_sidebar_stack</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -205,14 +206,46 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkStack">
+                  <object class="GtkStack" id="room_sidebar_stack">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <placeholder/>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">&lt;Members&gt;</property>
+                      </object>
+                      <packing>
+                        <property name="name">room_member_list</property>
+                        <property name="title" translatable="yes">Members</property>
+                        <property name="icon_name">contact-new</property>
+                      </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">&lt;Files&gt;</property>
+                      </object>
+                      <packing>
+                        <property name="name">room_file_list</property>
+                        <property name="title" translatable="yes">Files</property>
+                        <property name="icon_name">mail-attachment</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">&lt;Notifications&gt;</property>
+                      </object>
+                      <packing>
+                        <property name="name">room_notification_list</property>
+                        <property name="title" translatable="yes">Notifications</property>
+                        <property name="icon_name">preferences-system-notifications</property>
+                        <property name="position">2</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -236,8 +269,109 @@
         </child>
       </object>
     </child>
+    <child type="titlebar">
+      <object class="GtkHeaderBar">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="show_close_button">True</property>
+        <child>
+          <object class="GtkButton" id="user_button">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="spacing">4</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="icon_name">address-book-new</property>
+                    <property name="icon_size">3</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Guest</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkPopover" id="user_menu">
+    <property name="can_focus">False</property>
+    <property name="relative_to">user_button</property>
+    <property name="position">bottom</property>
     <child>
-      <placeholder/>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkStackSwitcher" id="user_menu_stack_switcher">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="stack">user_menu_stack</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkStack" id="user_menu_stack">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">&lt;Login&gt;</property>
+              </object>
+              <packing>
+                <property name="name">login</property>
+                <property name="title" translatable="yes">Login</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">&lt;Register&gt;</property>
+              </object>
+              <packing>
+                <property name="name">register</property>
+                <property name="title" translatable="yes">Register</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
     </child>
   </object>
 </interface>
