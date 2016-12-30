@@ -78,6 +78,6 @@ impl App {
         self.gtk_app.run(args_refs.len() as i32, &args_refs);
 
         // Clean up
-        self.matrix_client_thread_join_handle.join();
+        self.matrix_client_thread_join_handle.join().unwrap();
     }
 }

@@ -1,7 +1,9 @@
 use gtk;
 use reqwest;
-use ruma_client_api::r0 as api;
+use ruma_client_api as api;
 use std::sync::mpsc::Sender;
+
+mod reqwest_ext;
 
 pub fn run_client_main(dispatch_tx: Sender<Box<Fn(&gtk::Builder) + Send>>) {
     let client = reqwest::Client::new().unwrap();
@@ -9,7 +11,7 @@ pub fn run_client_main(dispatch_tx: Sender<Box<Fn(&gtk::Builder) + Send>>) {
         .body("{}")
         .send()
         .unwrap()
-        .json::<api::account::register::Response>()
+        .json::<api::r0::account::register::Response>()
         .unwrap();
 
     dispatch_tx.send(box move |builder| {
