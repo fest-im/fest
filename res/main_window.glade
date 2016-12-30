@@ -8,12 +8,11 @@
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkWindow" id="main_window">
-    <property name="width_request">400</property>
-    <property name="height_request">300</property>
+  <object class="GtkApplicationWindow" id="main_window">
     <property name="can_focus">False</property>
     <property name="default_width">600</property>
     <property name="default_height">400</property>
+    <property name="show_menubar">False</property>
     <child>
       <object class="GtkPaned">
         <property name="visible">True</property>

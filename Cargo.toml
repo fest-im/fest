@@ -4,11 +4,12 @@ name = "ruma-gtk"
 version = "0.1.0"
 
 [dependencies]
-#xdg = "2.0.0"
+gio = "0.1.1"
+reqwest = "0.2.0"
 
 [dependencies.gtk]
+features = ["v3_12"]
 version = "0.1.1"
-features = ["v3_10"]
 
 [dependencies.ruma-client-api]
 git = "https://github.com/ruma/ruma-client-api"
