@@ -16,8 +16,6 @@ pub struct App {
 
 impl App {
     /// Create an App instance
-    ///
-    /// Requires gtk::init() to have executed successfully.
     pub fn new() -> App {
         let gtk_app = gtk::Application::new(Some(APP_ID), gio::ApplicationFlags::empty())
             .expect("Failed to initialize GtkApplication");

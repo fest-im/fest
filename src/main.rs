@@ -22,8 +22,6 @@ fn main() {
     // let data_path     = xdg_dirs.place_data_file("data.yml").unwrap();
     // TODO: Read settings
 
-    // gtk::init().expect("Failed to initialize GTK.");
-
     let app = App::new();
     app.run();
 
