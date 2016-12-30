@@ -62,13 +62,8 @@ impl App {
     }
 
     pub fn run(self) {
-        // Might just be the only way to go from impl Iterator<Item=String> to &[&str]
         let args = env::args().collect::<Vec<_>>();
-        let mut args_refs = Vec::<&str>::new();
-
-        for r in &args {
-            args_refs.push(r);
-        }
+        let args_refs = args.iter().map(|x| &x[..]).collect::<Vec<_>>();
 
         let dispatch_rx = self.dispatch_rx;
         let gtk_builder = self.gtk_builder;
