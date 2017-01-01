@@ -38,18 +38,10 @@ impl App {
 
         let gtk_builder = gtk::Builder::new_from_file("res/main_window.glade");
 
-        let gtk_builder2 = gtk_builder.clone();
+        let builder = gtk_builder.clone();
         gtk_app.connect_activate(move |app| {
-            let user_button: gtk::Button = gtk_builder2.get_object("user_button")
-                .expect("Couldn't find user_button in ui file.");
-
-            let user_menu: gtk::Popover = gtk_builder2.get_object("user_menu")
-                .expect("Couldn't find user_menu in ui file.");
-
-            user_button.connect_clicked(move |_| user_menu.show());
-
             // Set up shutdown callback
-            let window: gtk::Window = gtk_builder2.get_object("main_window")
+            let window: gtk::Window = builder.get_object("main_window")
                 .expect("Couldn't find main_window in ui file.");
 
             let app2 = app.clone();
@@ -58,6 +50,16 @@ impl App {
                 Inhibit(false)
             });
 
+            // Set up user popover
+            let user_button: gtk::Button = builder.get_object("user_button")
+                .expect("Couldn't find user_button in ui file.");
+
+            let user_menu: gtk::Popover = builder.get_object("user_menu")
+                .expect("Couldn't find user_menu in ui file.");
+
+            user_button.connect_clicked(move |_| user_menu.show());
+
+            // Associate window with the Application and show it
             window.set_application(Some(app));
             window.show_all();
         });
