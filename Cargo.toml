@@ -11,5 +11,5 @@ reqwest = "0.2.0"
 features = ["v3_12"]
 version = "0.1.1"
 
-[dependencies.ruma-client-api]
-git = "https://github.com/ruma/ruma-client-api"
+[dependencies.ruma-client]
+git = "https://github.com/ruma/ruma-client.git"

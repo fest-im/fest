@@ -2,7 +2,7 @@ use gio;
 use gtk;
 use gtk::prelude::*;
 use std::{env, sync, time, thread};
-use matrix_client;
+use bg_thread;
 
 // TODO: Is this the correct format for GApplication IDs?
 const APP_ID: &'static str = "jplatte.ruma_gtk";
@@ -15,7 +15,7 @@ pub struct App {
     /// GTK Application which runs the main loop.
     gtk_app: gtk::Application,
 
-    /// Used to access the UI elements. 
+    /// Used to access the UI elements.
     gtk_builder: gtk::Builder,
 
     /// Channel receiver which allows to run actions from the matrix connection thread.
@@ -27,7 +27,7 @@ pub struct App {
 
     /// Matrix communication thread join handler used to clean up the tread when
     /// closing the application.
-    matrix_client_thread_join_handle: thread::JoinHandle<()>,
+    bg_thread_join_handle: thread::JoinHandle<()>,
 }
 
 impl App {
@@ -67,14 +67,14 @@ impl App {
         // Create channel to allow the matrix connection thread to send closures to the main loop.
         let (dispatch_tx, dispatch_rx) = sync::mpsc::channel::<Box<Fn(&gtk::Builder) + Send>>();
 
-        let matrix_client_thread_join_handle =
-            thread::spawn(move || matrix_client::run_client_main(dispatch_tx));
+        let bg_thread_join_handle =
+            thread::spawn(move || bg_thread::run(dispatch_tx));
 
         App {
             gtk_app: gtk_app,
             gtk_builder: gtk_builder,
             dispatch_rx: dispatch_rx,
-            matrix_client_thread_join_handle: matrix_client_thread_join_handle,
+            bg_thread_join_handle: bg_thread_join_handle,
         }
     }
 
@@ -101,6 +101,6 @@ impl App {
         self.gtk_app.run(args_refs.len() as i32, &args_refs);
 
         // Clean up
-        self.matrix_client_thread_join_handle.join().unwrap();
+        self.bg_thread_join_handle.join().unwrap();
     }
 }
