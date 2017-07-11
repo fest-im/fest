@@ -6,6 +6,7 @@
 //#![feature(field_init_shorthand)]
 
 extern crate futures;
+extern crate hyper;
 extern crate gio;
 extern crate gtk;
 extern crate ruma_client;

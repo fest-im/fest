@@ -1,26 +1,99 @@
 use std;
-use std::error::Error;
 
-use futures::{self, Future, Stream};
+use futures;
+use futures::future::{self, Loop, Future};
+use futures::stream::Stream;
 use gtk;
-use ruma_client::Client as RumaClient;
-use tokio_core::reactor::{Core, Handle};
+use ruma_client::{self, Client as RumaClient};
+use tokio_core::reactor::{Core as TokioCore, Handle as TokioHandle};
 use url::Url;
 
-fn bg_main(
-    homeserver: Url,
-    core_handle: Handle,
-    homeserver_chan_rx: futures::sync::mpsc::Receiver<Url>,
-    dispatch_chan_tx: std::sync::mpsc::Sender<Box<Fn(&gtk::Builder) + Send>>,
-) -> impl Future<Item = (), Error = Box<Error>> {
-    let client = RumaClient::https(&core_handle, homeserver, None).unwrap();
+pub enum Command {
+    Connect {
+        homeserver_url: Url,
+        connection_method: ConnectionMethod,
+    },
+}
 
-    futures::future::ok(())
+#[derive(Clone)]
+pub enum ConnectionMethod {
+    Login { username: String, password: String },
+    Guest,
+    //Register,
+}
 
-    // TODO: background main loop
-    // TODO: use loop_fn instead of manually recursing?
+#[derive(Debug)]
+enum Error {
+    RumaClientError(ruma_client::Error),
+    RecvError(std::sync::mpsc::RecvError),
+}
 
-    /*dispatch_chan_tx.send(box move |builder| {
+impl From<ruma_client::Error> for Error {
+    fn from(err: ruma_client::Error) -> Error {
+        Error::RumaClientError(err)
+    }
+}
+
+impl From<std::sync::mpsc::RecvError> for Error {
+    fn from(err: std::sync::mpsc::RecvError) -> Error {
+        Error::RecvError(err)
+    }
+}
+
+fn bg_main<'a>(
+    tokio_handle: &'a TokioHandle,
+    command_chan_rx: futures::sync::mpsc::Receiver<Command>,
+    ui_dispatch_chan_tx: std::sync::mpsc::Sender<Box<Fn(&gtk::Builder) + Send>>,
+) -> impl Future<Item = (), Error = Error> + 'a {
+    future::loop_fn(command_chan_rx, move |command_chan_rx| {
+        command_chan_rx
+            .into_future()
+            // Some sort of error occurred that is not the channel being closed?! Error type is (),
+            // so it doesn't even impl Error. Assume this will never happen (for now).
+            .map_err(|_| unreachable!())
+            .and_then(|(opt_command, command_chan_rx)| match opt_command {
+                Some(command) => {
+                    let (homeserver_url, connection_method) = match command {
+                        Command::Connect { homeserver_url, connection_method }
+                            => (homeserver_url, connection_method),
+                        //_ => unimplemented!(),
+                    };
+
+                    Ok((homeserver_url, connection_method, command_chan_rx))
+                }
+                None => Err(std::sync::mpsc::RecvError.into()),
+            }).and_then(move |(homeserver_url, connection_method, command_chan_rx)| {
+                //let client = RumaClient::https(tokio_handle, homeserver_url, None).unwrap();
+                let client = RumaClient::new(tokio_handle, homeserver_url, None);
+
+                match connection_method {
+                    ConnectionMethod::Login { username, password } => {
+                        box client.log_in(username, password) as
+                            Box<Future<Item = (), Error = ruma_client::Error>>
+                    }
+                    ConnectionMethod::Guest => box client.register_guest(),
+                }.and_then(move |_| {
+                    future::loop_fn((), move |_| {
+                        use ruma_client::api::r0::sync::sync_events;
+
+                        sync_events::call(client.clone(), sync_events::Request {
+                            filter: None,
+                            since: None,
+                            full_state: None,
+                            set_presence: None,
+                            timeout: None,
+                        }).map(|res| {
+                            println!("{:?}", res);
+
+                            Loop::Continue(())
+                        })
+                    })
+                }).map_err(Error::from)
+                    //.select(command_chan_rx.into_future())
+            })
+    })
+
+    /*ui_dispatch_chan_tx.send(box move |builder| {
         builder
             .get_object::<gtk::Stack>("user_button_stack")
             .expect("Can't find user_button_stack in ui file.")
@@ -34,24 +107,11 @@ fn bg_main(
 }
 
 pub fn run(
-    homeserver_chan_rx: futures::sync::mpsc::Receiver<Url>,
-    dispatch_chan_tx: std::sync::mpsc::Sender<Box<Fn(&gtk::Builder) + Send>>,
+    command_chan_rx: futures::sync::mpsc::Receiver<Command>,
+    ui_dispatch_chan_tx: std::sync::mpsc::Sender<Box<Fn(&gtk::Builder) + Send>>,
 ) {
-    let mut core = Core::new().unwrap();
-    let handle = core.handle();
+    let mut core = TokioCore::new().unwrap();
+    let tokio_handle = core.handle();
 
-    core.run(
-        homeserver_chan_rx
-            .into_future()
-            .map_err(|_| std::sync::mpsc::RecvError.into())
-            .and_then(
-                move |(opt_url, homeserver_chan_rx)| -> Box<Future<Item = (), Error = Box<Error>>> {
-                    if let Some(url) = opt_url {
-                        box bg_main(url, handle, homeserver_chan_rx, dispatch_chan_tx)
-                    } else {
-                        box futures::future::ok(())
-                    }
-                },
-            ),
-    ).unwrap();
+    let _ = core.run(bg_main(&tokio_handle, command_chan_rx, ui_dispatch_chan_tx)).unwrap();
 }

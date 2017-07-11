@@ -5,7 +5,8 @@ dependencies = [
  "futures 0.1.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "gio 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "gtk 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "ruma-client 0.1.0 (git+https://github.com/ruma/ruma-client.git)",
+ "hyper 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "ruma-client 0.1.0 (git+https://github.com/jplatte/ruma-client.git?branch=room_id-workaround)",
  "tokio-core 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 1.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -44,7 +45,7 @@ name = "base64"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -52,7 +53,7 @@ name = "base64"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "safemem 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -73,7 +74,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "byteorder"
-version = "1.0.0"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -81,7 +82,7 @@ name = "bytes"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "iovec 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -616,7 +617,7 @@ dependencies = [
 
 [[package]]
 name = "redox_syscall"
-version = "0.1.21"
+version = "0.1.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -673,14 +674,14 @@ dependencies = [
 [[package]]
 name = "ruma-client"
 version = "0.1.0"
-source = "git+https://github.com/ruma/ruma-client.git#39bd63d5769341db34e22e14ec074ca89413d8d1"
+source = "git+https://github.com/jplatte/ruma-client.git?branch=room_id-workaround#186eb218de1244aaa635eee2ce7b2c425de4df43"
 dependencies = [
  "futures 0.1.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper-tls 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "native-tls 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "ruma-api 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "ruma-client-api 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "ruma-client-api 0.1.0 (git+https://github.com/jplatte/ruma-client-api?branch=room_id-workaround)",
  "ruma-identifiers 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -692,7 +693,7 @@ dependencies = [
 [[package]]
 name = "ruma-client-api"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
+source = "git+https://github.com/jplatte/ruma-client-api?branch=room_id-workaround#5669b6a692f98894936534e0d5499e009e48743a"
 dependencies = [
  "futures 0.1.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -920,7 +921,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.26 (registry+https://github.com/rust-lang/crates.io-index)",
- "redox_syscall 0.1.21 (registry+https://github.com/rust-lang/crates.io-index)",
+ "redox_syscall 0.1.26 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -1072,7 +1073,7 @@ dependencies = [
 "checksum bitflags 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "4f67931368edf3a9a51d29886d245f1c3db2f1ef0dcc9e35ff70341b78c10d23"
 "checksum bitflags 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)" = "1370e9fc2a6ae53aea8b7a5110edbd08836ed87c88736dfabccade1c2b44bff4"
 "checksum bitflags 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)" = "4efd02e230a02e18f92fc2735f44597385ed02ad8f831e7c1c1156ee5e1ab3a5"
-"checksum byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c40977b0ee6b9885c9013cd41d9feffdd22deb3bb4dc3a71d901cc7a77de18c8"
+"checksum byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ff81738b726f5d099632ceaffe7fb65b90212e8dce59d518729e7e8634032d3d"
 "checksum bytes 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)" = "8b24f16593f445422331a5eed46b72f7f171f910fead4f2ea8f17e727e9c5c14"
 "checksum c_vec 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "6237ac5a4b1e81c213c24c6437964c61e646df910a914b4ab1487b46df20bd13"
 "checksum cairo-rs 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)" = "0180a8b65dc13e78479c6a47c4d5f094d64dc34465a9433c6daef9ae2fbfb3ee"
@@ -1130,14 +1131,14 @@ dependencies = [
 "checksum rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)" = "022e0636ec2519ddae48154b028864bdce4eaf7d35226ab8e65c611be97b189d"
 "checksum rayon 0.7.1 (registry+https://github.com/rust-lang/crates.io-index)" = "a77c51c07654ddd93f6cb543c7a849863b03abc7e82591afda6dc8ad4ac3ac4a"
 "checksum rayon-core 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "7febc28567082c345f10cddc3612c6ea020fc3297a1977d472cf9fdb73e6e493"
-"checksum redox_syscall 0.1.21 (registry+https://github.com/rust-lang/crates.io-index)" = "8f4120cd9183efc5cdbac08bee870325ede495745391b0de336723b430d7a1ad"
+"checksum redox_syscall 0.1.26 (registry+https://github.com/rust-lang/crates.io-index)" = "9df6a71a1e67be2104410736b2389fb8e383c1d7e9e792d629ff13c02867147a"
 "checksum regex 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "1731164734096285ec2a5ec7fea5248ae2f5485b3feeb0115af4fda2183b2d1b"
 "checksum regex-syntax 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "ad890a5eef7953f55427c50575c680c42841653abd2b028b68cd223d157f62db"
 "checksum ring 0.9.7 (registry+https://github.com/rust-lang/crates.io-index)" = "24293de46bac74c9b9c05b40ff8496bbc8b9ae242a9b89f754e1154a43bc7c4c"
 "checksum ruma-api 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "5476c9703549f0ccb8b8cb208addd6b16ed1464226d884168537f5b90985afb3"
 "checksum ruma-api-macros 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a7a122639190f7a7301ba180f31ce888b287c01880d3d34cc0e32a927d44548a"
-"checksum ruma-client 0.1.0 (git+https://github.com/ruma/ruma-client.git)" = "<none>"
-"checksum ruma-client-api 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "0c6b50787c763fcdc44474bc45a715ee2f2d199a2dc5a0fd979872bf02312a5b"
+"checksum ruma-client 0.1.0 (git+https://github.com/jplatte/ruma-client.git?branch=room_id-workaround)" = "<none>"
+"checksum ruma-client-api 0.1.0 (git+https://github.com/jplatte/ruma-client-api?branch=room_id-workaround)" = "<none>"
 "checksum ruma-events 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "facf7128c5dc9033b835902e68f87ecaeefaa2374ee7c96669014f7ec7241ba0"
 "checksum ruma-identifiers 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e45a368130ceb92b3e88bcfbbbb38efa82e0f235bc068117559c1ba0e148c298"
 "checksum ruma-signatures 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "895d8e7044367c451347f4a0327b7df1bf14a66ed6345ce431c4e8d01cdcb535"

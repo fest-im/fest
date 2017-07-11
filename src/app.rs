@@ -1,12 +1,13 @@
 use std::{self, env, thread};
 use std::time::Duration;
 
-use futures;
+use futures::{self, Sink};
 use gio;
 use gtk;
 use gtk::prelude::*;
-use bg_thread;
 use url::Url;
+
+use bg_thread::{self, Command, ConnectionMethod};
 
 // TODO: Is this the correct format for GApplication IDs?
 const APP_ID: &'static str = "jplatte.ruma_gtk";
@@ -22,21 +23,17 @@ pub struct App {
     /// Used to access the UI elements.
     gtk_builder: gtk::Builder,
 
-    /// Sender to the homeserver channel.
+    /// Sender for the matrix channel.
     ///
-    /// With this channel, we tell the background thread to connect to a new
-    /// matrix homeserver. Currently, there can only be one connection to a
-    /// homeserver at one time, so sending a homeserver url over this channel
-    /// will result in the background thread first disconnecting, if it is
-    /// connected to another homeserver already.
-    homeserver_chan_tx: futures::sync::mpsc::Sender<Url>,
+    /// This channel is used to send commands to the background thread.
+    command_chan_tx: futures::sink::Wait<futures::sync::mpsc::Sender<bg_thread::Command>>,
 
     /// Channel receiver which allows to run actions from the matrix connection thread.
     ///
     /// Long polling is required to receive messages from the rooms and so they have to
     /// run in separate threads.  In order to allow those threads to modify the gtk content,
     /// they will send closures to the main thread using this channel.
-    dispatch_chan_rx: std::sync::mpsc::Receiver<Box<Fn(&gtk::Builder) + Send>>,
+    ui_dispatch_chan_rx: std::sync::mpsc::Receiver<Box<Fn(&gtk::Builder) + Send>>,
 
     /// Matrix communication thread join handler used to clean up the tread when
     /// closing the application.
@@ -75,24 +72,25 @@ impl App {
             window.show_all();
         }));
 
-        let (homeserver_chan_tx, homeserver_chan_rx) = futures::sync::mpsc::channel(1);
+        let (command_chan_tx, command_chan_rx) = futures::sync::mpsc::channel(1);
+        let command_chan_tx = command_chan_tx.wait();
 
         // Create channel to allow the matrix connection thread to send closures to the main loop.
-        let (dispatch_chan_tx, dispatch_chan_rx) = std::sync::mpsc::channel();
+        let (ui_dispatch_chan_tx, ui_dispatch_chan_rx) = std::sync::mpsc::channel();
 
         let bg_thread_join_handle =
-            thread::spawn(move || bg_thread::run(homeserver_chan_rx, dispatch_chan_tx));
+            thread::spawn(move || bg_thread::run(command_chan_rx, ui_dispatch_chan_tx));
 
         App {
             gtk_app,
             gtk_builder,
-            homeserver_chan_tx,
-            dispatch_chan_rx,
+            command_chan_tx,
+            ui_dispatch_chan_rx,
             bg_thread_join_handle,
         }
     }
 
-    pub fn run(self) {
+    pub fn run(mut self) {
         // Convert the args to a Vec<&str>. Application::run requires argv as &[&str]
         // and envd::args() returns an iterator of Strings.
         let args = env::args().collect::<Vec<_>>();
@@ -100,15 +98,26 @@ impl App {
 
         // Poll the matrix communication thread channel and run the closures to allow
         // the threads to run actions in the main loop.
-        let dispatch_chan_rx = self.dispatch_chan_rx;
+        let ui_dispatch_chan_rx = self.ui_dispatch_chan_rx;
         let gtk_builder = self.gtk_builder;
         gtk::idle_add(move || {
-            if let Ok(dispatch_fn) = dispatch_chan_rx.recv_timeout(Duration::from_millis(5)) {
+            if let Ok(dispatch_fn) = ui_dispatch_chan_rx.recv_timeout(Duration::from_millis(5)) {
                 dispatch_fn(&gtk_builder);
             }
 
             Continue(true)
         });
+
+        self.command_chan_tx
+            .send(Command::Connect {
+                // TODO: https, when done debugging (or sooner)!
+                homeserver_url: Url::parse("http://matrix.org").unwrap(),
+                connection_method: ConnectionMethod::Login {
+                    username: "TODO".to_owned(),
+                    password: "TODO".to_owned(),
+                },
+            })
+            .unwrap(); // TODO: How to handle background thread crash?
 
         // Run the main loop.
         self.gtk_app.run(args_refs.len() as i32, &args_refs);
