@@ -16,4 +16,7 @@ version = "0.1.3"
 
 [dependencies.ruma-client]
 git = "https://github.com/jplatte/ruma-client.git"
-branch = "room_id-workaround"
+branch = "synapse-workarounds"
+
+[replace]
+"ruma-events:0.9.0" = { git = "https://github.com/jplatte/ruma-events", branch = "synapse-workarounds" }

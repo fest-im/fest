@@ -68,10 +68,9 @@ fn bg_main<'a>(
 
                 match connection_method {
                     ConnectionMethod::Login { username, password } => {
-                        box client.log_in(username, password) as
-                            Box<Future<Item = (), Error = ruma_client::Error>>
+                        future::Either::A(client.log_in(username, password))
                     }
-                    ConnectionMethod::Guest => box client.register_guest(),
+                    ConnectionMethod::Guest => future::Either::B(client.register_guest()),
                 }.and_then(move |_| {
                     future::loop_fn((), move |_| {
                         use ruma_client::api::r0::sync::sync_events;
@@ -113,5 +112,11 @@ pub fn run(
     let mut core = TokioCore::new().unwrap();
     let tokio_handle = core.handle();
 
-    let _ = core.run(bg_main(&tokio_handle, command_chan_rx, ui_dispatch_chan_tx)).unwrap();
+    match core.run(bg_main(&tokio_handle, command_chan_rx, ui_dispatch_chan_tx)) {
+        Ok(_) => {}
+        Err(e) => {
+            // TODO: Show error message in UI. Quit / restart thread?
+            eprintln!("ruma_gtk: background thread error: {:?}", e);
+        }
+    };
 }
