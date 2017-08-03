@@ -110,8 +110,7 @@ impl App {
 
         self.command_chan_tx
             .send(Command::Connect {
-                // TODO: https, when done debugging (or sooner)!
-                homeserver_url: Url::parse("http://matrix.org").unwrap(),
+                homeserver_url: Url::parse("https://matrix.org").unwrap(),
                 connection_method: ConnectionMethod::Login {
                     username: "TODO".to_owned(),
                     password: "TODO".to_owned(),

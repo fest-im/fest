@@ -63,8 +63,7 @@ fn bg_main<'a>(
                 }
                 None => Err(std::sync::mpsc::RecvError.into()),
             }).and_then(move |(homeserver_url, connection_method, command_chan_rx)| {
-                //let client = RumaClient::https(tokio_handle, homeserver_url, None).unwrap();
-                let client = RumaClient::new(tokio_handle, homeserver_url, None);
+                let client = RumaClient::https(tokio_handle, homeserver_url, None).unwrap();
 
                 match connection_method {
                     ConnectionMethod::Login { username, password } => {
