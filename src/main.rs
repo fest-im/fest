@@ -1,10 +1,6 @@
 #![feature(box_syntax)]
 #![feature(conservative_impl_trait)]
 
-// not using this yet because rustfmt doesn't support it:
-// https://github.com/rust-lang-nursery/rustfmt/issues/1215
-//#![feature(field_init_shorthand)]
-
 extern crate futures;
 extern crate hyper;
 extern crate gio;
