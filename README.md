@@ -1,5 +1,10 @@
 # ruma-gtk
 
+[![GitHub stars][badge]][repo]
+
+[badge]: https://img.shields.io/github/stars/jplatte/ruma-gtk.svg?style=social&label=Stars
+[repo]: https://github.com/jplatte/ruma-gtk
+
 A GTK+ 3 [Matrix](https://matrix.org) chat client (work in progress).
 
 Available under the terms of the GNU GPL version 3 or later. See `LICENSE` for
