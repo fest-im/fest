@@ -1,8 +1,9 @@
-# [ruma-gtk](https://github.com/jplatte/ruma-gtk)
+# ruma-gtk
 
 A GTK+ 3 [Matrix](https://matrix.org) chat client (work in progress).
 
-Available under the terms of the GNU GPL version 3. See `LICENSE` for details.
+Available under the terms of the GNU GPL version 3 or later. See `LICENSE` for
+details.
 
 ## Requirements
 
@@ -26,7 +27,9 @@ cargo run
 
 ## Contributing
 
-Chat with us at [#ruma-gtk:matrix.org](https://matrix.to/#/#ruma-gtk:matrix.org).
+Chat with us at [#ruma-gtk:matrix.org][].
 
-Issues or pull requests can be filed on the [GitHub tracker](https://github.com/jplatte/ruma-gtk/issues).
+Issues or pull requests can be filed on the [GitHub tracker][issues].
 
+[#ruma-gtk:matrix.org]: https://matrix.to/#/#ruma-gtk:matrix.org
+[issues]: https://github.com/jplatte/ruma-gtk/issues

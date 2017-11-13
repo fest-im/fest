@@ -1,6 +1,7 @@
 [package]
 authors = ["Jonas Platte <mail@jonasplatte.de>"]
 name = "ruma-gtk"
+license = "GPL-3.0+"
 version = "0.1.0"
 
 [dependencies]
