@@ -1,9 +1,9 @@
-# ruma-gtk
+# Fest
 
 [![GitHub stars][badge]][repo]
 
-[badge]: https://img.shields.io/github/stars/jplatte/ruma-gtk.svg?style=social&label=Stars
-[repo]: https://github.com/jplatte/ruma-gtk
+[badge]: https://img.shields.io/github/stars/jplatte/fest-im.svg?style=social&label=Stars
+[repo]: https://github.com/jplatte/fest-im
 
 A GTK+ 3 [Matrix](https://matrix.org) chat client (work in progress).
 
@@ -20,7 +20,7 @@ details.
 First, clone the repository:
 
 ```
-git clone https://github.com/jplatte/ruma-gtk.git
+git clone https://github.com/jplatte/fest-im.git
 ```
 
 Then run with Cargo:
@@ -32,9 +32,9 @@ cargo run
 
 ## Contributing
 
-Chat with us at [#ruma-gtk:matrix.org][].
+Chat with us at [#fest-im:matrix.org][].
 
 Issues or pull requests can be filed on the [GitHub tracker][issues].
 
-[#ruma-gtk:matrix.org]: https://matrix.to/#/#ruma-gtk:matrix.org
-[issues]: https://github.com/jplatte/ruma-gtk/issues
+[#fest-im:matrix.org]: https://matrix.to/#/#fest-im:matrix.org
+[issues]: https://github.com/jplatte/fest-im/issues

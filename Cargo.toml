@@ -1,6 +1,6 @@
 [package]
 authors = ["Jonas Platte <mail@jonasplatte.de>"]
-name = "ruma-gtk"
+name = "fest-im"
 license = "GPL-3.0+"
 version = "0.1.0"
 
