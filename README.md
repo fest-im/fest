@@ -12,7 +12,7 @@ details.
 
 ## Requirements
 
-* [GTK+](https://www.gtk.org/download/index.php) ≥ 3.12
+* [GTK+](https://www.gtk.org/download/index.php) ≥ 3.16
 * [Rust](https://www.rust-lang.org/en-US/install.html)
 
 ## How to Run
