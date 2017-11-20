@@ -9,8 +9,7 @@ use url::Url;
 
 use bg_thread::{self, Command, ConnectionMethod};
 
-// TODO: Is this the correct format for GApplication IDs?
-const APP_ID: &'static str = "jplatte.ruma_gtk";
+const APP_ID: &'static str = "io.github.jplatte.fest-im";
 
 /// State for the main thread.
 ///
