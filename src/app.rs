@@ -57,15 +57,6 @@ impl App {
                 Inhibit(false)
             }));
 
-            // Set up user popover
-            let user_button: gtk::Button = gtk_builder.get_object("user_button")
-                .expect("Couldn't find user_button in ui file.");
-
-            let user_menu: gtk::Popover = gtk_builder.get_object("user_menu")
-                .expect("Couldn't find user_menu in ui file.");
-
-            user_button.connect_clicked(move |_| user_menu.show());
-
             // Associate window with the Application and show it
             window.set_application(Some(app));
             window.show_all();
