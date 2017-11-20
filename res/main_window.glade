@@ -57,7 +57,7 @@
       </object>
       <packing>
         <property name="submenu">room_join</property>
-        <property name="position">1</property>
+        <property name="position">3</property>
       </packing>
     </child>
     <child>
@@ -151,7 +151,7 @@
       </object>
       <packing>
         <property name="submenu">main</property>
-        <property name="position">3</property>
+        <property name="position">1</property>
       </packing>
     </child>
   </object>
@@ -339,6 +339,7 @@
       </object>
       <packing>
         <property name="submenu">main</property>
+        <property name="position">0</property>
       </packing>
     </child>
     <child>
@@ -821,7 +822,7 @@
       </object>
       <packing>
         <property name="submenu">account_new</property>
-        <property name="position">1</property>
+        <property name="position">2</property>
       </packing>
     </child>
     <child>
@@ -907,7 +908,7 @@
       </object>
       <packing>
         <property name="submenu">new_password</property>
-        <property name="position">2</property>
+        <property name="position">3</property>
       </packing>
     </child>
     <child>
@@ -1057,7 +1058,7 @@
       </object>
       <packing>
         <property name="submenu">main</property>
-        <property name="position">3</property>
+        <property name="position">1</property>
       </packing>
     </child>
   </object>
