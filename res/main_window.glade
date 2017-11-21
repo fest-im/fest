@@ -363,7 +363,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkLabel">
+          <object class="GtkLabel" id="rdl_leave_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="margin_top">6</property>
@@ -383,7 +383,7 @@
             <property name="margin_top">6</property>
             <property name="layout_style">spread</property>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="rdl_stay_button">
                 <property name="label" translatable="yes">Stay</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -396,7 +396,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="rdl_leave_butto">
                 <property name="label" translatable="yes">Leave</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -445,7 +445,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkEntry">
+          <object class="GtkEntry" id="rdi_invite_entry">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="margin_top">6</property>
@@ -466,7 +466,7 @@
             <property name="margin_top">6</property>
             <property name="layout_style">spread</property>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="rdi_cancel_button">
                 <property name="label" translatable="yes">Cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -479,7 +479,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="rdi_invite_button">
                 <property name="label" translatable="yes">Invite</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -504,9 +504,6 @@
         <property name="position">3</property>
       </packing>
     </child>
-    <style>
-      <class name="question"/>
-    </style>
   </object>
   <object class="GtkPopover" id="room_interactions_popover">
     <property name="can_focus">False</property>
