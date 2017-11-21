@@ -42,7 +42,7 @@ pub struct App {
 impl App {
     /// Create an App instance
     pub fn new() -> App {
-        let gtk_app = gtk::Application::new(Some(APP_ID), gio::ApplicationFlags::empty())
+        let gtk_app = gtk::Application::new(Some(APP_ID), gio::APPLICATION_FLAGS_NONE)
             .expect("Failed to initialize GtkApplication");
 
         let gtk_builder = gtk::Builder::new_from_file("res/main_window.glade");
@@ -110,7 +110,7 @@ impl App {
 
             // Associate window with the Application and show it
             window.set_application(Some(app));
-            window.show_all();
+            window.present();
         }));
 
         let (command_chan_tx, command_chan_rx) = futures::sync::mpsc::channel(1);
