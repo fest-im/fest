@@ -1,7 +1,7 @@
 use std;
 
 use futures;
-use futures::future::{self, Loop, Future};
+use futures::future::{self, Future, Loop};
 use futures::stream::Stream;
 use gtk;
 use ruma_client::{self, Client as RumaClient};

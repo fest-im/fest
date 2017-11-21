@@ -2,9 +2,9 @@
 #![feature(conservative_impl_trait)]
 
 extern crate futures;
-extern crate hyper;
 extern crate gio;
 extern crate gtk;
+extern crate hyper;
 extern crate ruma_client;
 extern crate tokio_core;
 extern crate url;
