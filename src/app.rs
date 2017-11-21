@@ -73,6 +73,8 @@ impl App {
                 .expect("Couldn't find room leave cancel button in ui file.");
 
             rdl_stay_button.connect_clicked(clone!(rd_popover_widget => move |_| {
+                // It would be nice to use Popover::{popup,popdown} here, but
+                // that is only available in gtk 3.22.
                 rd_popover_widget.hide();
             }));
 
@@ -80,6 +82,8 @@ impl App {
                 .expect("Couldn't find room invite cancel button in ui file.");
 
             rdi_cancel_button.connect_clicked(clone!(rd_popover_widget => move |_| {
+                // It would be nice to use Popover::{popup,popdown} here, but
+                // that is only available in gtk 3.22.
                 rd_popover_widget.hide();
             }));
 
