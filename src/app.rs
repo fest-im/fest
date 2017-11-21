@@ -52,6 +52,8 @@ impl App {
             let rd_popover: gtk::PopoverMenu = gtk_builder.get_object("room_details_popover")
                 .expect("Couldn't find room details popover in ui file.");
             let rd_popover_widget = rd_popover.clone().upcast::<gtk::Widget>();
+            let rp_revealer: gtk::Revealer = gtk_builder.get_object("right_pane_revealer")
+                .expect("Couldn't find right pane revealer");
 
             let rd_invite_button: gtk::Button = gtk_builder.get_object("rd_invite_button")
                 .expect("Couldn't find room invite button in ui file.");
@@ -93,6 +95,13 @@ impl App {
 
             u_register_button.connect_clicked(clone!(u_menu => move |_| {
                 u_menu.open_submenu("new_password");
+            }));
+
+            let rp_toggle: gtk::ToggleButton = gtk_builder.get_object("right_pane_toggle")
+                .expect("Couldn't find right pane toggle button.");
+
+            rp_toggle.connect_toggled(clone!(rp_revealer => move |toggle| {
+                rp_revealer.set_reveal_child(toggle.get_active())
             }));
 
             // TODO: Add and connect directory view
