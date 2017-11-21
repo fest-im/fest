@@ -21,7 +21,7 @@ use app::App;
 // use std::path::Path;
 
 fn main() {
-    // let xdg_dirs      = xdg::BaseDirectories::with_prefix("ruma_gtk").unwrap();
+    // let xdg_dirs      = xdg::BaseDirectories::with_prefix("fest-im").unwrap();
     // let data_path     = xdg_dirs.place_data_file("data.yml").unwrap();
     // TODO: Read settings
 
