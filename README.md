@@ -3,7 +3,7 @@
 [![GitHub stars][badge]][repo]
 
 [badge]: https://img.shields.io/github/stars/jplatte/fest-im.svg?style=social&label=Stars
-[repo]: https://github.com/jplatte/fest-im
+[repo]: https://github.com/fest-im/fest
 
 A GTK+ 3 [Matrix](https://matrix.org) chat client (work in progress). Right now,
 Fest is not functional!
@@ -27,7 +27,7 @@ rustup install nightly
 First, clone the repository:
 
 ```
-git clone https://github.com/jplatte/fest-im.git
+git clone https://github.com/fest-im/fest.git
 ```
 
 Then run with Cargo:
@@ -44,4 +44,4 @@ Chat with us at [#fest-im:matrix.org][].
 Issues or pull requests can be filed on the [GitHub tracker][issues].
 
 [#fest-im:matrix.org]: https://matrix.to/#/#fest-im:matrix.org
-[issues]: https://github.com/jplatte/fest-im/issues
+[issues]: https://github.com/fest-im/fest/issues
