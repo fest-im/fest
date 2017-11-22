@@ -53,41 +53,41 @@ impl App {
             // but that is only available in gtk 3.22.
             let rd_popover: gtk::Popover = gtk_builder.get_object("room_details_popover")
                 .expect("Couldn't find room details popover in ui file.");
-            let ri_popover: gtk::Popover = gtk_builder.get_object("room_invite_popover")
-                .expect("Couldn't find room invite popover in ui file.");
-            let rl_popover: gtk::Popover = gtk_builder.get_object("room_leave_popover")
-                .expect("Couldn't find room leave popover in ui file.");
+            let rd_stack: gtk::Stack = gtk_builder.get_object("rd_stack")
+                .expect("Couldn't find room details stack in ui file.");
             let rp_revealer: gtk::Revealer = gtk_builder.get_object("right_pane_revealer")
                 .expect("Couldn't find right pane revealer in ui file.");
+
+            rd_popover.connect_hide(clone!(rd_stack => move |_| {
+                rd_stack.set_visible_child_name("details");
+            }));
 
             let rd_invite_button: gtk::Button = gtk_builder.get_object("rd_invite_button")
                 .expect("Couldn't find room invite button in ui file.");
 
-            rd_invite_button.connect_clicked(clone!(rd_popover, ri_popover => move |_| {
-                rd_popover.hide();
-                ri_popover.show();
+            rd_invite_button.connect_clicked(clone!(rd_stack => move |_| {
+                rd_stack.set_visible_child_name("invite");
             }));
 
             let rdi_cancel_button: gtk::Button = gtk_builder.get_object("rdi_cancel_button")
                 .expect("Couldn't find room invite cancel button in ui file.");
 
-            rdi_cancel_button.connect_clicked(clone!(ri_popover => move |_| {
-                ri_popover.hide();
+            rdi_cancel_button.connect_clicked(clone!(rd_popover => move |_| {
+                rd_popover.hide();
             }));
 
             let rd_leave_button: gtk::Button = gtk_builder.get_object("rd_leave_button")
                 .expect("Couldn't find room leave button in ui file.");
 
-            rd_leave_button.connect_clicked(clone!(rd_popover, rl_popover => move |_| {
-                rd_popover.hide();
-                rl_popover.show();
+            rd_leave_button.connect_clicked(clone!(rd_stack => move |_| {
+                rd_stack.set_visible_child_name("leave");
             }));
 
             let rdl_stay_button: gtk::Button = gtk_builder.get_object("rdl_stay_button")
                 .expect("Couldn't find room leave cancel button in ui file.");
 
-            rdl_stay_button.connect_clicked(clone!(rl_popover => move |_| {
-                rl_popover.hide();
+            rdl_stay_button.connect_clicked(clone!(rd_popover => move |_| {
+                rd_popover.hide();
             }));
 
             // TODO: Add and connect room settings view
