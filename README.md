@@ -5,7 +5,8 @@
 [badge]: https://img.shields.io/github/stars/jplatte/fest-im.svg?style=social&label=Stars
 [repo]: https://github.com/jplatte/fest-im
 
-A GTK+ 3 [Matrix](https://matrix.org) chat client (work in progress).
+A GTK+ 3 [Matrix](https://matrix.org) chat client (work in progress). Right now,
+Fest is not functional!
 
 Available under the terms of the GNU GPL version 3 or later. See `LICENSE` for
 details.
@@ -13,7 +14,13 @@ details.
 ## Requirements
 
 * [GTK+](https://www.gtk.org/download/index.php) ≥ 3.16
-* [Rust](https://www.rust-lang.org/en-US/install.html)
+* [Rust](https://www.rust-lang.org/en-US/install.html) Nightly
+
+The easiest way to install Rust nightly is with [rustup](https://www.rustup.rs):
+
+```
+rustup install nightly
+```
 
 ## How to Run
 
@@ -27,7 +34,7 @@ Then run with Cargo:
 
 ```
 cd ruma-git
-cargo run
+cargo +nightly run
 ```
 
 ## Contributing
