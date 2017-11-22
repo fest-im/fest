@@ -2,6 +2,7 @@
 authors = ["Jonas Platte <mail@jonasplatte.de>"]
 name = "fest-im"
 license = "GPL-3.0+"
+repository = "https://github.com/fest-im/fest"
 version = "0.1.0"
 
 [dependencies]

@@ -9,7 +9,7 @@ use url::Url;
 
 use bg_thread::{self, Command, ConnectionMethod};
 
-const APP_ID: &'static str = "org.fest-im.fest-im";
+const APP_ID: &'static str = "org.fest-im.fest";
 
 /// State for the main thread.
 ///

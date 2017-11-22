@@ -2,7 +2,7 @@
 
 [![GitHub stars][badge]][repo]
 
-[badge]: https://img.shields.io/github/stars/jplatte/fest-im.svg?style=social&label=Stars
+[badge]: https://img.shields.io/github/stars/fest-im/fest.svg?style=social&label=Stars
 [repo]: https://github.com/fest-im/fest
 
 A GTK+ 3 [Matrix](https://matrix.org) chat client (work in progress). Right now,
@@ -27,7 +27,7 @@ rustup install nightly
 First, clone the repository:
 
 ```
-git clone https://github.com/fest-im/fest.git
+git clone https://github.com/fest-im/fest
 ```
 
 Then run with Cargo:
