@@ -181,6 +181,7 @@
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
                     <property name="valign">center</property>
+                    <property name="margin_right">12</property>
                     <property name="icon_name">face-smile</property>
                     <property name="icon_size">6</property>
                   </object>
@@ -196,6 +197,7 @@
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
                     <property name="valign">center</property>
+                    <property name="margin_right">12</property>
                     <property name="label" translatable="yes">Fest</property>
                     <property name="selectable">True</property>
                     <attributes>
@@ -214,6 +216,7 @@
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
                     <property name="valign">center</property>
+                    <property name="margin_right">18</property>
                     <property name="label" translatable="yes">#fest:matrix.org</property>
                     <property name="use_markup">True</property>
                     <property name="selectable">True</property>
@@ -1583,6 +1586,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">center</property>
+                <property name="valign">center</property>
                 <property name="margin_left">12</property>
                 <property name="margin_right">12</property>
                 <property name="margin_top">6</property>
@@ -1606,6 +1610,7 @@
                   <object class="GtkLabel" id="title_name_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="halign">start</property>
                     <property name="valign">center</property>
                     <property name="label" translatable="yes">Fest</property>
                     <style>
@@ -1622,6 +1627,7 @@
                   <object class="GtkLabel" id="title_topic_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="halign">start</property>
                     <property name="valign">center</property>
                     <property name="label" translatable="yes">A GTK+ 3 Matrix client written in Rust and which has a channel description that is far too long, enabling my testing of what it looks like when they get this gigantic. https://github.com/jplatte/fest-im</property>
                     <property name="ellipsize">end</property>
