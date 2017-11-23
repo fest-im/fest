@@ -92,6 +92,14 @@ impl App {
                 rd_popover.hide();
             }));
 
+            let rd_pins_button: gtk::ToggleButton = gtk_builder.get_object("rd_pins_button")
+                .expect("Couldn't find room pins buttin in ui file.");
+
+            rd_pins_button.connect_toggled(clone!(rd_popover => move |_toggle| {
+                // TODO: Toggle room's pinned messages
+                rd_popover.hide();
+            }));
+
             let rd_settings_button: gtk::Button = gtk_builder.get_object("rd_settings_button")
                 .expect("Couldn't find room settings button in ui file.");
 
@@ -127,6 +135,34 @@ impl App {
             // TODO: Add and connect directory view
             let _lp_directory_button: gtk::Button = gtk_builder.get_object("lp_directory_button")
                 .expect("Couldn't find directory button in ui file.");
+
+            // Set up composer callbacks
+            let ri_popover: gtk::Popover = gtk_builder.get_object("room_interactions_popover")
+                .expect("Couldn't find room interactions popover in ui file.");
+
+            let ri_attach_button: gtk::Button = gtk_builder.get_object("ri_attach_button")
+                .expect("Couldn't find send attachment button in ui file.");
+
+            ri_attach_button.connect_clicked(clone!(ri_popover => move |_| {
+                // TODO: Open file chooser and send attachment
+                ri_popover.hide();
+            }));
+
+            let ri_video_button: gtk::Button = gtk_builder.get_object("ri_video_button")
+                .expect("Couldn't find video call button in ui file.");
+
+            ri_video_button.connect_clicked(clone!(ri_popover => move |_| {
+                // TODO: Start video call
+                ri_popover.hide();
+            }));
+
+            let ri_voice_button: gtk::Button = gtk_builder.get_object("ri_voice_button")
+                .expect("Couldn't find voice call button in ui file.");
+
+            ri_voice_button.connect_clicked(clone!(ri_popover => move |_| {
+                // TODO: Start voice call
+                ri_popover.hide();
+            }));
 
             // Set up shutdown callback
             let window: gtk::Window = gtk_builder.get_object("main_window")
