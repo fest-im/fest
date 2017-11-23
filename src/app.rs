@@ -132,9 +132,57 @@ impl App {
                 rp_revealer.set_reveal_child(toggle.get_active())
             }));
 
-            // TODO: Add and connect directory view
-            let _lp_directory_button: gtk::Button = gtk_builder.get_object("lp_directory_button")
+            // When switching the main window stack child, we need to modify the
+            // header bar to match
+            let mw_stack: gtk::Stack = gtk_builder.get_object("main_window_stack")
+                .expect("Couldn't find main window stack in ui file.");
+            let h_bar: gtk::HeaderBar = gtk_builder.get_object("header_bar")
+                .expect("Couldn't find header bar in ui file.");
+            let h_accounts_button: gtk::Button = gtk_builder.get_object("header_accounts_button")
+                .expect("Couldn't find header accounts button in ui file.");
+            let h_back_button: gtk::Button = gtk_builder.get_object("header_back_button")
+                .expect("Couldn't find header back button in ui file.");
+            let title_button: gtk::Widget = gtk_builder.get_object("title_menu_button")
+                .expect("Couldn't find room title menu button in ui file.");
+            let h_search_button: gtk::Button = gtk_builder.get_object("header_search_button")
+                .expect("Couldn't find header search button in ui file.");
+
+            let lp_directory_button: gtk::Button = gtk_builder.get_object("lp_directory_button")
                 .expect("Couldn't find directory button in ui file.");
+
+            lp_directory_button.connect_clicked(clone!(mw_stack,
+                                                       h_bar,
+                                                       h_accounts_button,
+                                                       h_back_button,
+                                                       h_search_button,
+                                                       rp_toggle => move |_| {
+                h_accounts_button.hide();
+                h_search_button.hide();
+                rp_toggle.hide();
+
+                h_back_button.show();
+
+                h_bar.set_title("Directory");
+                h_bar.set_property_custom_title(None);
+
+                mw_stack.set_visible_child_name("directory_view");
+            }));
+            h_back_button.connect_clicked(clone!(mw_stack,
+                                                 h_bar,
+                                                 title_button,
+                                                 h_accounts_button,
+                                                 h_back_button,
+                                                 h_search_button,
+                                                 rp_toggle => move |_| {
+                h_accounts_button.show();
+                h_search_button.show();
+                rp_toggle.show();
+                h_back_button.hide();
+
+                h_bar.set_title("Fest"); // TODO: Set to actual room name
+                h_bar.set_property_custom_title(Some(&title_button));
+                mw_stack.set_visible_child_name("room_view");
+            }));
 
             // Set up composer callbacks
             let ri_popover: gtk::Popover = gtk_builder.get_object("room_interactions_popover")
