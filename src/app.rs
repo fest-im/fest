@@ -124,6 +124,9 @@ impl App {
                 Inhibit(false)
             }));
 
+            // Set up window configuration
+            window.set_title("Fest");
+
             // Associate window with the Application and show it
             window.set_application(Some(app));
             window.present();
