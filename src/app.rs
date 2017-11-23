@@ -57,6 +57,8 @@ impl App {
                 .expect("Couldn't find room details stack in ui file.");
             let rp_revealer: gtk::Revealer = gtk_builder.get_object("right_pane_revealer")
                 .expect("Couldn't find right pane revealer in ui file.");
+            let rv_stack: gtk::Stack = gtk_builder.get_object("room_view_stack")
+                .expect("Couldn't find room view stack in ui file.");
 
             rd_popover.connect_hide(clone!(rd_stack => move |_| {
                 rd_stack.set_visible_child_name("details");
@@ -90,9 +92,20 @@ impl App {
                 rd_popover.hide();
             }));
 
-            // TODO: Add and connect room settings view
-            let _rd_settings_button: gtk::Button = gtk_builder.get_object("rd_settings_button")
+            let rd_settings_button: gtk::Button = gtk_builder.get_object("rd_settings_button")
                 .expect("Couldn't find room settings button in ui file.");
+
+            rd_settings_button.connect_clicked(clone!(rd_popover, rv_stack => move |_| {
+                rv_stack.set_visible_child_name("settings");
+                rd_popover.hide();
+            }));
+
+            let rvs_back_button: gtk::Button = gtk_builder.get_object("rvs_back_button")
+                .expect("Couldn't find room settings back button in ui file.");
+
+            rvs_back_button.connect_clicked(clone!(rv_stack => move |_| {
+                rv_stack.set_visible_child_name("chat");
+            }));
 
             let u_menu: gtk::PopoverMenu = gtk_builder.get_object("user_menu")
                 .expect("Couldn't find user menu in ui file.");
