@@ -164,6 +164,7 @@ impl App {
                     h_back_button.show();
 
                     h_bar.set_title("Directory");
+                    h_bar.set_subtitle("");
                     h_bar.set_property_custom_title(None);
 
                     mw_stack.set_visible_child_name("directory_view");
@@ -216,6 +217,39 @@ impl App {
                 // TODO: Start voice call
                 ri_popover.hide();
             }));
+
+            // Setup greeter and related functions
+            // TODO: Make this is only show on first run
+            h_accounts_button.hide();
+            h_search_button.hide();
+            rp_toggle.hide();
+            h_back_button.hide();
+            h_bar.set_property_custom_title(None);
+            h_bar.set_title("Fest");
+            h_bar.set_subtitle("Matrix chat client");
+            mw_stack.set_visible_child_name("greeter_view");
+
+            let gv_guest_button: gtk::Button = gtk_builder.get_object("gv_guest_button")
+                .expect("Couldn't find greeter view guest button in ui file.");
+
+            gv_guest_button.connect_clicked(clone!(
+                mw_stack,
+                h_bar,
+                title_button,
+                h_accounts_button,
+                h_back_button,
+                h_search_button,
+                rp_toggle => move |_| {
+                    h_accounts_button.show();
+                    h_search_button.show();
+                    rp_toggle.show();
+                    h_back_button.hide();
+
+                    h_bar.set_title("Fest"); // TODO: Set to actual room name
+                    h_bar.set_property_custom_title(Some(&title_button));
+                    mw_stack.set_visible_child_name("room_view");
+                }
+            ));
 
             // Set up shutdown callback
             let window: gtk::Window = gtk_builder.get_object("main_window")
