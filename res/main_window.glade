@@ -1681,7 +1681,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="margin_bottom">12</property>
-                <property name="label" translatable="yes">How do you wish to poceed?</property>
+                <property name="label" translatable="yes">How do you wish to proceed?</property>
               </object>
               <packing>
                 <property name="expand">False</property>
