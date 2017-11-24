@@ -262,6 +262,7 @@ impl App {
 
             // Set up window configuration
             window.set_title("Fest");
+            rv_stack.set_visible_child_name("chat");
 
             // Associate window with the Application and show it
             window.set_application(Some(app));
