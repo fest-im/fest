@@ -92,28 +92,50 @@ impl App {
                 rd_popover.hide();
             }));
 
-            let rd_pins_button: gtk::ToggleButton = gtk_builder.get_object("rd_pins_button")
-                .expect("Couldn't find room pins buttin in ui file.");
+            let rd_pins_toggle: gtk::ToggleButton = gtk_builder.get_object("rd_pins_button")
+                .expect("Couldn't find room pins button in ui file.");
 
-            rd_pins_button.connect_toggled(clone!(rd_popover => move |_toggle| {
+            rd_pins_toggle.connect_toggled(clone!(rd_popover => move |_toggle| {
                 // TODO: Toggle room's pinned messages
                 rd_popover.hide();
             }));
 
-            let rd_settings_button: gtk::Button = gtk_builder.get_object("rd_settings_button")
+            let rp_toggle: gtk::ToggleButton = gtk_builder.get_object("right_pane_toggle")
+                .expect("Couldn't find right pane toggle button.");
+
+            rp_toggle.connect_toggled(clone!(rp_revealer => move |toggle| {
+                rp_revealer.set_reveal_child(toggle.get_active())
+            }));
+
+            let rd_settings_toggle: gtk::ToggleButton = gtk_builder.get_object("rd_settings_button")
                 .expect("Couldn't find room settings button in ui file.");
 
-            rd_settings_button.connect_clicked(clone!(rd_popover, rv_stack => move |_| {
-                rv_stack.set_visible_child_name("settings");
-                rd_popover.hide();
-            }));
+            rd_settings_toggle.connect_toggled(clone!(
+                rd_pins_toggle,
+                rd_popover,
+                rp_toggle,
+                rv_stack => move |toggle| {
+                    if toggle.get_active() {
+                        rv_stack.set_visible_child_name("settings");
+                        rd_pins_toggle.hide();
+                        rp_toggle.hide();
+                        rd_popover.hide();
+                    } else {
+                        rv_stack.set_visible_child_name("chat");
+                        rd_pins_toggle.show();
+                        rp_toggle.show();
+                        rd_popover.hide();
+                    }
+                }
+            ));
 
             let rvs_back_button: gtk::Button = gtk_builder.get_object("rvs_back_button")
                 .expect("Couldn't find room settings back button in ui file.");
 
-            rvs_back_button.connect_clicked(clone!(rv_stack => move |_| {
-                rv_stack.set_visible_child_name("chat");
+            rvs_back_button.connect_clicked(clone!(rd_settings_toggle => move |_| {
+                rd_settings_toggle.clicked();
             }));
+
 
             let u_menu: gtk::PopoverMenu = gtk_builder.get_object("user_menu")
                 .expect("Couldn't find user menu in ui file.");
@@ -123,13 +145,6 @@ impl App {
 
             u_register_button.connect_clicked(clone!(u_menu => move |_| {
                 u_menu.open_submenu("new_password");
-            }));
-
-            let rp_toggle: gtk::ToggleButton = gtk_builder.get_object("right_pane_toggle")
-                .expect("Couldn't find right pane toggle button.");
-
-            rp_toggle.connect_toggled(clone!(rp_revealer => move |toggle| {
-                rp_revealer.set_reveal_child(toggle.get_active())
             }));
 
             // When switching the main window stack child, we need to modify the
@@ -147,7 +162,7 @@ impl App {
             let h_search_button: gtk::Button = gtk_builder.get_object("header_search_button")
                 .expect("Couldn't find header search button in ui file.");
 
-            let view_switcher = clone! (
+            let view_switcher = clone!(
                 h_accounts_button,
                 h_back_button,
                 h_bar,
