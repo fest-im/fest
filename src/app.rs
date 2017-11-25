@@ -147,48 +147,55 @@ impl App {
             let h_search_button: gtk::Button = gtk_builder.get_object("header_search_button")
                 .expect("Couldn't find header search button in ui file.");
 
+            let view_switcher = clone! (
+                h_accounts_button,
+                h_back_button,
+                h_bar,
+                h_search_button,
+                mw_stack,
+                rp_toggle,
+                title_button => move |view, title, subtitle, back| {
+                    if view == "room_view" {
+                        h_accounts_button.show();
+                        h_search_button.show();
+                        rp_toggle.show();
+
+                        h_back_button.hide();
+
+                        h_bar.set_property_custom_title(Some(&title_button));
+                    } else {
+                        h_accounts_button.hide();
+                        h_search_button.hide();
+                        rp_toggle.hide();
+
+                        if let Some(s) = back {
+                            h_back_button.set_label(s);
+                            h_back_button.show();
+                        } else {
+                            h_back_button.hide();
+                        }
+
+                        h_bar.set_property_custom_title(None);
+                    }
+
+                    h_bar.set_title(title);
+                    h_bar.set_subtitle(subtitle);
+
+                    mw_stack.set_visible_child_name(view);
+                }
+            );
+
             let lp_directory_button: gtk::Button = gtk_builder.get_object("lp_directory_button")
                 .expect("Couldn't find directory button in ui file.");
 
-            lp_directory_button.connect_clicked(clone!(
-                mw_stack,
-                h_bar,
-                h_accounts_button,
-                h_back_button,
-                h_search_button,
-                rp_toggle => move |_| {
-                    h_accounts_button.hide();
-                    h_search_button.hide();
-                    rp_toggle.hide();
+            lp_directory_button.connect_clicked(clone!(view_switcher => move |_| {
+                view_switcher("directory_view", "Directory", "", Some("Back"));
+            }));
 
-                    h_back_button.show();
-
-                    h_bar.set_title("Directory");
-                    h_bar.set_subtitle("");
-                    h_bar.set_property_custom_title(None);
-
-                    mw_stack.set_visible_child_name("directory_view");
-                }
-            ));
-
-            h_back_button.connect_clicked(clone!(
-                mw_stack,
-                h_bar,
-                title_button,
-                h_accounts_button,
-                h_back_button,
-                h_search_button,
-                rp_toggle => move |_| {
-                    h_accounts_button.show();
-                    h_search_button.show();
-                    rp_toggle.show();
-                    h_back_button.hide();
-
-                    h_bar.set_title("Fest"); // TODO: Set to actual room name
-                    h_bar.set_property_custom_title(Some(&title_button));
-                    mw_stack.set_visible_child_name("room_view");
-                }
-            ));
+            h_back_button.connect_clicked(clone!(view_switcher => move |_| {
+                // TODO: Set to actual room name
+                view_switcher("room_view", "Fest", "", None);
+            }));
 
             // Set up composer callbacks
             let ri_popover: gtk::Popover = gtk_builder.get_object("room_interactions_popover")
@@ -220,36 +227,14 @@ impl App {
 
             // Setup greeter and related functions
             // TODO: Make this is only show on first run
-            h_accounts_button.hide();
-            h_search_button.hide();
-            rp_toggle.hide();
-            h_back_button.hide();
-            h_bar.set_property_custom_title(None);
-            h_bar.set_title("Fest");
-            h_bar.set_subtitle("Matrix chat client");
-            mw_stack.set_visible_child_name("greeter_view");
+            view_switcher("greeter_view", "Fest", "Matrix chat client", None);
 
             let gv_guest_button: gtk::Button = gtk_builder.get_object("gv_guest_button")
                 .expect("Couldn't find greeter view guest button in ui file.");
 
-            gv_guest_button.connect_clicked(clone!(
-                mw_stack,
-                h_bar,
-                title_button,
-                h_accounts_button,
-                h_back_button,
-                h_search_button,
-                rp_toggle => move |_| {
-                    h_accounts_button.show();
-                    h_search_button.show();
-                    rp_toggle.show();
-                    h_back_button.hide();
-
-                    h_bar.set_title("Fest"); // TODO: Set to actual room name
-                    h_bar.set_property_custom_title(Some(&title_button));
-                    mw_stack.set_visible_child_name("room_view");
-                }
-            ));
+            gv_guest_button.connect_clicked(clone!(view_switcher => move |_| {
+                view_switcher("directory_view", "Directory", "", Some("Skip"));
+            }));
 
             // Set up shutdown callback
             let window: gtk::Window = gtk_builder.get_object("main_window")

@@ -1,5 +1,6 @@
 #![feature(box_syntax)]
 #![feature(conservative_impl_trait)]
+#![feature(clone_closures)]
 
 extern crate futures;
 extern crate gio;
