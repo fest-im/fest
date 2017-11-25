@@ -1,4 +1,10 @@
-// from https://stackoverflow.com/a/43992218/1592377
+// From http://gtk-rs.org/tuto/closures
+//
+// This takes a comma separated list of elements which are then cloned for use
+// in a move closure. A `=>` separates the element(s) from the closure.
+//
+// This allows moved elements to be reused across multiple connected callbacks
+// without extra boilerplate code (in most cases).
 #[macro_export]
 macro_rules! clone {
     (@param _) => ( _ );
