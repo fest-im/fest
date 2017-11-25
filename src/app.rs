@@ -115,16 +115,15 @@ impl App {
                 rd_popover,
                 rp_toggle,
                 rv_stack => move |toggle| {
-                    if toggle.get_active() {
+                    let active = toggle.get_active();
+                    rd_pins_toggle.set_visible(!active);
+                    rp_toggle.set_visible(!active);
+                    rd_popover.hide();
+
+                    if active {
                         rv_stack.set_visible_child_name("settings");
-                        rd_pins_toggle.hide();
-                        rp_toggle.hide();
-                        rd_popover.hide();
                     } else {
                         rv_stack.set_visible_child_name("chat");
-                        rd_pins_toggle.show();
-                        rp_toggle.show();
-                        rd_popover.hide();
                     }
                 }
             ));
@@ -170,19 +169,16 @@ impl App {
                 mw_stack,
                 rp_toggle,
                 title_button => move |view, title, subtitle, back| {
-                    if view == "room_view" {
-                        h_accounts_button.show();
-                        h_search_button.show();
-                        rp_toggle.show();
+                    let is_room = "room_view" == view;
+                    h_accounts_button.set_visible(is_room);
+                    h_search_button.set_visible(is_room);
+                    rp_toggle.set_visible(is_room);
 
+                    if is_room {
                         h_back_button.hide();
 
                         h_bar.set_property_custom_title(Some(&title_button));
                     } else {
-                        h_accounts_button.hide();
-                        h_search_button.hide();
-                        rp_toggle.hide();
-
                         if let Some(s) = back {
                             h_back_button.set_label(s);
                             h_back_button.show();
