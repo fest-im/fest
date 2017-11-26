@@ -3,6 +3,7 @@ use std::time::Duration;
 
 use futures::{self, Sink};
 use gio;
+use gio::prelude::*;
 use gtk;
 use gtk::prelude::*;
 use url::Url;
@@ -42,7 +43,7 @@ pub struct App {
 impl App {
     /// Create an App instance
     pub fn new() -> App {
-        let gtk_app = gtk::Application::new(Some(APP_ID), gio::APPLICATION_FLAGS_NONE)
+        let gtk_app = gtk::Application::new(Some(APP_ID), gio::ApplicationFlags::FLAGS_NONE)
             .expect("Failed to initialize GtkApplication");
 
         let gtk_builder = gtk::Builder::new_from_file("res/main_window.glade");
@@ -186,7 +187,7 @@ impl App {
                             h_back_button.hide();
                         }
 
-                        h_bar.set_property_custom_title(None);
+                        h_bar.set_property_custom_title::<gtk::Widget>(None);
                     }
 
                     h_bar.set_title(title);
@@ -284,11 +285,6 @@ impl App {
     }
 
     pub fn run(mut self) {
-        // Convert the args to a Vec<&str>. Application::run requires argv as &[&str]
-        // and envd::args() returns an iterator of Strings.
-        let args = env::args().collect::<Vec<_>>();
-        let args_refs = args.iter().map(|x| &x[..]).collect::<Vec<_>>();
-
         // Poll the matrix communication thread channel and run the closures to allow
         // the threads to run actions in the main loop.
         let ui_dispatch_chan_rx = self.ui_dispatch_chan_rx;
@@ -312,7 +308,7 @@ impl App {
             .unwrap(); // TODO: How to handle background thread crash?
 
         // Run the main loop.
-        self.gtk_app.run(args_refs.len() as i32, &args_refs);
+        self.gtk_app.run(&env::args().collect::<Vec<_>>());
 
         // Clean up
         self.bg_thread_join_handle.join().unwrap();
