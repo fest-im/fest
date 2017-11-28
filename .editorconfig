@@ -9,3 +9,7 @@ trim_trailing_whitespace = true
 
 indent_style = space
 indent_size = 4
+
+[*.{glade,xml}]
+indent_size = 2
+
