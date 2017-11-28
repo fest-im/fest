@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.1 -->
+<!-- Generated with glade 3.20.2 -->
 <interface>
   <requires lib="gtk+" version="3.16"/>
   <object class="GtkPopoverMenu" id="room_add_menu">
@@ -1425,6 +1425,9 @@
                             <property name="hexpand">True</property>
                             <property name="vexpand">True</property>
                             <property name="border_width">6</property>
+                            <style>
+                              <class name="background"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1517,7 +1520,7 @@
                           </packing>
                         </child>
                         <style>
-                          <class name="view"/>
+                          <class name="background"/>
                         </style>
                       </object>
                       <packing>
