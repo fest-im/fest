@@ -45,3 +45,4 @@ Issues or pull requests can be filed on the [GitHub tracker][issues].
 
 [#fest-im:matrix.org]: https://matrix.to/#/#fest-im:matrix.org
 [issues]: https://github.com/fest-im/fest/issues
+

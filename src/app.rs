@@ -314,3 +314,4 @@ impl App {
         self.bg_thread_join_handle.join().unwrap();
     }
 }
+

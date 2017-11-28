@@ -19,3 +19,4 @@ version = "0.3.0"
 [dependencies.ruma-client]
 git = "https://github.com/jplatte/ruma-client.git"
 branch = "synapse-workarounds"
+
