@@ -4,6 +4,7 @@ authors = ["Jonas Platte <mail@jonasplatte.de>"]
 license = "GPL-3.0+"
 version = "0.1.0"
 repository = "https://github.com/fest-im/fest"
+build = "build/build.rs"
 
 [dependencies]
 futures = "0.1.17"
