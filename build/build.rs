@@ -14,4 +14,3 @@ fn main() {
     gen_gresource("fest", "res");
     gen_gresource("icons", "res/icons/hicolor");
 }
-

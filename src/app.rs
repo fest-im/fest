@@ -50,8 +50,7 @@ impl App {
         // Register gresources
         let register = |gr_bytes| {
             let b = glib::Bytes::from_static(gr_bytes);
-            let gresource = gio::Resource::new_from_data(&b)
-                .expect("Failed to load gresource.");
+            let gresource = gio::Resource::new_from_data(&b).expect("Failed to load gresource.");
             gio::resources_register(&gresource);
         };
 
@@ -326,4 +325,3 @@ impl App {
         self.bg_thread_join_handle.join().unwrap();
     }
 }
-
