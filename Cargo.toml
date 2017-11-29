@@ -1,5 +1,5 @@
 [package]
-name = "fest-im"
+name = "fest"
 authors = ["Jonas Platte <mail@jonasplatte.de>"]
 license = "GPL-3.0+"
 version = "0.1.0"

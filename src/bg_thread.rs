@@ -115,8 +115,7 @@ pub fn run(
         Ok(_) => {}
         Err(e) => {
             // TODO: Show error message in UI. Quit / restart thread?
-            eprintln!("fest-im: background thread error: {:?}", e);
+            eprintln!("fest: background thread error: {:?}", e);
         }
     };
 }
-
