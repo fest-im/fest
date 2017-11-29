@@ -33,7 +33,7 @@ git clone https://github.com/fest-im/fest
 Then run with Cargo:
 
 ```
-cd ruma-git
+cd fest
 cargo +nightly run
 ```
 
