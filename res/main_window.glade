@@ -1881,7 +1881,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="opacity">0.65000000000000002</property>
-                <property name="pixbuf">builder-view-right-pane-symbolic.symbolic.png</property>
+                <property name="icon_name">builder-view-right-pane-symbolic</property>
               </object>
             </child>
           </object>

@@ -4,6 +4,7 @@
 
 extern crate futures;
 extern crate gio;
+extern crate glib;
 extern crate gtk;
 extern crate hyper;
 extern crate ruma_client;

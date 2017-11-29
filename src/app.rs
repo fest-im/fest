@@ -4,6 +4,7 @@ use std::time::Duration;
 use futures::{self, Sink};
 use gio;
 use gio::prelude::*;
+use glib;
 use gtk;
 use gtk::prelude::*;
 use url::Url;
@@ -46,7 +47,18 @@ impl App {
         let gtk_app = gtk::Application::new(Some(APP_ID), gio::ApplicationFlags::FLAGS_NONE)
             .expect("Failed to initialize GtkApplication");
 
-        let gtk_builder = gtk::Builder::new_from_file("res/main_window.glade");
+        // Register gresources
+        let register = |gr_bytes| {
+            let b = glib::Bytes::from_static(gr_bytes);
+            let gresource = gio::Resource::new_from_data(&b)
+                .expect("Failed to load gresource.");
+            gio::resources_register(&gresource);
+        };
+
+        register(include_bytes!("../res/fest.gresource"));
+        register(include_bytes!("../res/icons/hicolor/icons.gresource"));
+
+        let gtk_builder = gtk::Builder::new_from_resource("/org/fest-im/fest/main_window.glade");
 
         gtk_app.connect_activate(clone!(gtk_builder => move |app| {
             // Set up UI navigation button callbacks

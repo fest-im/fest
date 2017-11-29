@@ -162,6 +162,7 @@ version = "0.1.0"
 dependencies = [
  "futures 0.1.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "gio 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "glib 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gtk 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.11.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "ruma-client 0.1.0 (git+https://github.com/jplatte/ruma-client.git?branch=synapse-workarounds)",
