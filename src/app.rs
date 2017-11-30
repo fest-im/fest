@@ -60,6 +60,16 @@ impl App {
         let gtk_builder = gtk::Builder::new_from_resource("/org/fest-im/fest/main_window.glade");
 
         gtk_app.connect_activate(clone!(gtk_builder => move |app| {
+            // Add app actions
+            let act_prefs = gio::SimpleAction::new("preferences", None);
+            let act_about = gio::SimpleAction::new("about", None);
+            let act_quit = gio::SimpleAction::new("quit", None);
+
+            act_quit.connect_activate(clone!(app => move |_, _| {
+                app.quit();
+            }));
+            app.add_action(&act_quit);
+
             // Set up UI navigation button callbacks
             // It would be nice to use Popover::{popup,popdown} throughout here,
             // but that is only available in gtk 3.22.
