@@ -62,6 +62,7 @@ impl App {
         gtk_app.connect_activate(clone!(gtk_builder => move |app| {
             // Add app actions
             let act_prefs = gio::SimpleAction::new("preferences", None);
+            let act_shortcuts = gio::SimpleAction::new("shortcuts", None);
             let act_about = gio::SimpleAction::new("about", None);
             let act_quit = gio::SimpleAction::new("quit", None);
 
