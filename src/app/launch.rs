@@ -7,9 +7,10 @@ use gtk::prelude::*;
 pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
     gtk_app.connect_activate(clone!(gtk_builder => move |app| {
         // Add app actions
-        let act_prefs = gio::SimpleAction::new("preferences", None);
-        let act_shortcuts = gio::SimpleAction::new("shortcuts", None);
-        let act_about = gio::SimpleAction::new("about", None);
+        // TODO: Implement prefs, shortcuts, and about actions
+        let _act_prefs = gio::SimpleAction::new("preferences", None);
+        let _act_shortcuts = gio::SimpleAction::new("shortcuts", None);
+        let _act_about = gio::SimpleAction::new("about", None);
         let act_quit = gio::SimpleAction::new("quit", None);
 
         act_quit.connect_activate(clone!(app => move |_, _| {
