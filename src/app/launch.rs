@@ -18,7 +18,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
         }));
         app.add_action(&act_quit);
 
-        // Set up UI navigation button callbacks
+        // Set up UI navigation button callbacks and relevant window actions
         // It would be nice to use Popover::{popup,popdown} throughout here,
         // but that is only available in gtk 3.22.
         let rd_popover: gtk::Popover = gtk_builder.get_object("room_details_popover")
@@ -32,10 +32,12 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
         let window: gtk::ApplicationWindow = gtk_builder.get_object("main_window")
             .expect("Couldn't find main_window in ui file.");
 
+        // Reset certain widgets to their default state when hidden
         rd_popover.connect_hide(clone!(rd_stack => move |_| {
             rd_stack.set_visible_child_name("details");
         }));
 
+        // Setup popover for inviting people to a room
         let act_show_rd_invite = gio::SimpleAction::new("show_rd_invite", None);
         let rd_invite_button: gtk::Button = gtk_builder.get_object("rd_invite_button")
             .expect("Couldn't find room invite button in ui file.");
@@ -59,6 +61,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             rd_popover.hide();
         }));
 
+        // Setup popover for leaving a room
         let act_show_rd_leave = gio::SimpleAction::new("show_rd_leave", None);
         let rd_leave_button: gtk::Button = gtk_builder.get_object("rd_leave_button")
             .expect("Couldn't find room leave button in ui file.");
@@ -82,6 +85,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             rd_popover.hide();
         }));
 
+        // Setup room pins toggle
         let act_toggle_room_pins = gio::SimpleAction::new("toggle_room_pins", None);
         let rd_pins_toggle: gtk::ToggleButton = gtk_builder.get_object("rd_pins_button")
             .expect("Couldn't find room pins button in ui file.");
@@ -96,6 +100,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             rd_popover.hide();
         }));
 
+        // Setup right panel toggle
         let act_toggle_right_pane = gio::SimpleAction::new("toggle_right_pane", None);
         let rp_toggle: gtk::ToggleButton = gtk_builder.get_object("right_pane_toggle")
             .expect("Couldn't find right pane toggle button.");
@@ -109,6 +114,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             rp_revealer.set_reveal_child(toggle.get_active())
         }));
 
+        // Setup room settings view
         let act_toggle_room_settings = gio::SimpleAction::new("toggle_room_settings", None);
         let rd_settings_toggle: gtk::ToggleButton = gtk_builder.get_object("rd_settings_button")
             .expect("Couldn't find room settings button in ui file.");
@@ -146,6 +152,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             rd_settings_toggle.clicked();
         }));
 
+        // Setup user menu
         let act_show_user_menu = gio::SimpleAction::new("show_user_menu", None);
         let u_menu: gtk::PopoverMenu = gtk_builder.get_object("user_menu")
             .expect("Couldn't find user menu in ui file.");
@@ -161,8 +168,8 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             u_menu.open_submenu("new_password");
         }));
 
-        // When switching the main window stack child, we need to modify the
-        // header bar to match
+        // When switching to/from the main window stack child, we need to
+        // modify the header bar to match
         let mw_stack: gtk::Stack = gtk_builder.get_object("main_window_stack")
             .expect("Couldn't find main window stack in ui file.");
         let h_bar: gtk::HeaderBar = gtk_builder.get_object("header_bar")
@@ -215,6 +222,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             }
         );
 
+        // Setup directory view
         let act_show_dir_view = gio::SimpleAction::new("show_dir_view", None);
         let lp_directory_button: gtk::Button = gtk_builder.get_object("lp_directory_button")
             .expect("Couldn't find directory button in ui file.");
@@ -228,6 +236,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             act_show_dir_view.activate(None);
         }));
 
+        // Setup room view
         let act_show_room_view = gio::SimpleAction::new("show_room_view", None);
 
         act_show_room_view.connect_activate(clone!(view_switcher => move |_, _| {
@@ -244,6 +253,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
         let ri_popover: gtk::Popover = gtk_builder.get_object("room_interactions_popover")
             .expect("Couldn't find room interactions popover in ui file.");
 
+        // Setup file attachment
         let act_attach_file = gio::SimpleAction::new("attach_file", None);
         let ri_attach_button: gtk::Button = gtk_builder.get_object("ri_attach_button")
             .expect("Couldn't find send attachment button in ui file.");
@@ -258,6 +268,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             act_attach_file.activate(None);
         }));
 
+        // Setup video call
         let act_video_call = gio::SimpleAction::new("video_call", None);
         let ri_video_button: gtk::Button = gtk_builder.get_object("ri_video_button")
             .expect("Couldn't find video call button in ui file.");
@@ -271,6 +282,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             act_video_call.activate(None);
         }));
 
+        // Setup voice call
         let act_voice_call = gio::SimpleAction::new("voice_call", None);
         let ri_voice_button: gtk::Button = gtk_builder.get_object("ri_voice_button")
             .expect("Couldn't find voice call button in ui file.");
