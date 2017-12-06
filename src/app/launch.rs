@@ -21,6 +21,8 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
         // Set up UI navigation button callbacks and relevant window actions
         // It would be nice to use Popover::{popup,popdown} throughout here,
         // but that is only available in gtk 3.22.
+        let mw_stack: gtk::Stack = gtk_builder.get_object("main_window_stack")
+            .expect("Couldn't find main window stack in ui file.");
         let rd_popover: gtk::Popover = gtk_builder.get_object("room_details_popover")
             .expect("Couldn't find room details popover in ui file.");
         let rd_stack: gtk::Stack = gtk_builder.get_object("rd_stack")
@@ -35,6 +37,12 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
         // Reset certain widgets to their default state when hidden
         rd_popover.connect_hide(clone!(rd_stack => move |_| {
             rd_stack.set_visible_child_name("details");
+        }));
+
+        mw_stack.connect_property_visible_child_name_notify(clone!(rv_stack => move |stack| {
+            if stack.get_visible_child_name() != Some("room".to_string()) {
+                rv_stack.set_visible_child_name("chat");
+            }
         }));
 
         // Setup popover for inviting people to a room
@@ -170,8 +178,6 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
 
         // When switching to/from the main window stack child, we need to
         // modify the header bar to match
-        let mw_stack: gtk::Stack = gtk_builder.get_object("main_window_stack")
-            .expect("Couldn't find main window stack in ui file.");
         let h_bar: gtk::HeaderBar = gtk_builder.get_object("header_bar")
             .expect("Couldn't find header bar in ui file.");
         let h_accounts_button: gtk::Button = gtk_builder.get_object("header_accounts_button")
@@ -316,7 +322,6 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
 
         // Set up window configuration
         window.set_title("Fest");
-        rv_stack.set_visible_child_name("chat");
 
         // Associate window with the Application and show it
         window.set_application(Some(app));
