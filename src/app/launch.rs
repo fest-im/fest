@@ -45,7 +45,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             }
         }));
 
-        // Setup popover for inviting people to a room
+        // Set up popover for inviting people to a room
         let act_show_rd_invite = gio::SimpleAction::new("show_rd_invite", None);
         let rd_invite_button: gtk::Button = gtk_builder.get_object("rd_invite_button")
             .expect("Couldn't find room invite button in ui file.");
@@ -69,7 +69,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             rd_popover.hide();
         }));
 
-        // Setup popover for leaving a room
+        // Set up popover for leaving a room
         let act_show_rd_leave = gio::SimpleAction::new("show_rd_leave", None);
         let rd_leave_button: gtk::Button = gtk_builder.get_object("rd_leave_button")
             .expect("Couldn't find room leave button in ui file.");
@@ -93,7 +93,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             rd_popover.hide();
         }));
 
-        // Setup room pins toggle
+        // Set up room pins toggle
         let act_toggle_room_pins = gio::SimpleAction::new("toggle_room_pins", None);
         let rd_pins_toggle: gtk::ToggleButton = gtk_builder.get_object("rd_pins_button")
             .expect("Couldn't find room pins button in ui file.");
@@ -108,7 +108,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             rd_popover.hide();
         }));
 
-        // Setup right panel toggle
+        // Set up right panel toggle
         let act_toggle_right_pane = gio::SimpleAction::new("toggle_right_pane", None);
         let rp_toggle: gtk::ToggleButton = gtk_builder.get_object("right_pane_toggle")
             .expect("Couldn't find right pane toggle button.");
@@ -122,7 +122,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             rp_revealer.set_reveal_child(toggle.get_active())
         }));
 
-        // Setup room settings view
+        // Set up room settings view
         let act_toggle_room_settings = gio::SimpleAction::new("toggle_room_settings", None);
         let rd_settings_toggle: gtk::ToggleButton = gtk_builder.get_object("rd_settings_button")
             .expect("Couldn't find room settings button in ui file.");
@@ -160,7 +160,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             rd_settings_toggle.clicked();
         }));
 
-        // Setup user menu
+        // Set up user menu
         let act_show_user_menu = gio::SimpleAction::new("show_user_menu", None);
         let u_menu: gtk::PopoverMenu = gtk_builder.get_object("user_menu")
             .expect("Couldn't find user menu in ui file.");
@@ -228,7 +228,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             }
         );
 
-        // Setup directory view
+        // Set up directory view
         let act_show_dir_view = gio::SimpleAction::new("show_dir_view", None);
         let lp_directory_button: gtk::Button = gtk_builder.get_object("lp_directory_button")
             .expect("Couldn't find directory button in ui file.");
@@ -242,7 +242,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             act_show_dir_view.activate(None);
         }));
 
-        // Setup room view
+        // Set up room view
         let act_show_room_view = gio::SimpleAction::new("show_room_view", None);
 
         act_show_room_view.connect_activate(clone!(view_switcher => move |_, _| {
@@ -259,7 +259,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
         let ri_popover: gtk::Popover = gtk_builder.get_object("room_interactions_popover")
             .expect("Couldn't find room interactions popover in ui file.");
 
-        // Setup file attachment
+        // Set up file attachment
         let act_attach_file = gio::SimpleAction::new("attach_file", None);
         let ri_attach_button: gtk::Button = gtk_builder.get_object("ri_attach_button")
             .expect("Couldn't find send attachment button in ui file.");
@@ -274,7 +274,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             act_attach_file.activate(None);
         }));
 
-        // Setup video call
+        // Set up video call
         let act_video_call = gio::SimpleAction::new("video_call", None);
         let ri_video_button: gtk::Button = gtk_builder.get_object("ri_video_button")
             .expect("Couldn't find video call button in ui file.");
@@ -288,7 +288,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             act_video_call.activate(None);
         }));
 
-        // Setup voice call
+        // Set up voice call
         let act_voice_call = gio::SimpleAction::new("voice_call", None);
         let ri_voice_button: gtk::Button = gtk_builder.get_object("ri_voice_button")
             .expect("Couldn't find voice call button in ui file.");
@@ -303,7 +303,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             act_voice_call.activate(None);
         }));
 
-        // Setup greeter and related functions
+        // Set up greeter and related functions
         // TODO: Make this is only show on first run
         view_switcher("greeter_view", "Fest", "Matrix chat client", None);
 
