@@ -189,6 +189,8 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
         let h_search_button: gtk::Button = gtk_builder.get_object("header_search_button")
             .expect("Couldn't find header search button in ui file.");
 
+        // TODO: Disable room and directory vew switch actions when there is not
+        // an account set up yet.
         let view_switcher = clone!(
             act_show_user_menu,
             act_toggle_right_pane,
@@ -313,6 +315,19 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
         gv_guest_button.connect_clicked(clone!(view_switcher => move |_| {
             view_switcher("directory_view", "Directory", "", Some("Skip"));
         }));
+
+        // Set up action accelerators
+        app.set_accels_for_action("app.quit", &["<Ctl>q"]);
+        app.set_accels_for_action("win.show_rd_invite", &["<Ctl>i"]);
+        app.set_accels_for_action("win.show_rd_leave", &["<Ctl>l"]);
+        app.set_accels_for_action("win.toggle_room_pins", &["F7"]);
+        app.set_accels_for_action("win.toggle_right_pane", &["F6"]);
+        app.set_accels_for_action("win.show_user_menu", &["<Ctl>u"]);
+        app.set_accels_for_action("win.show_dir_view", &["F3"]);
+        app.set_accels_for_action("win.show_room_view", &["F2"]);
+        app.set_accels_for_action("win.attach_file", &["<Ctl><Shift>a"]);
+        app.set_accels_for_action("win.video_call", &["<Ctl><Shift>v"]);
+        app.set_accels_for_action("win.voice_call", &["<Ctl><Shift>c"]);
 
         // Set up shutdown callback
         window.connect_delete_event(clone!(act_quit => move |_, _| {
