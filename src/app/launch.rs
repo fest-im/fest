@@ -176,8 +176,8 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
             u_menu.open_submenu("new_password");
         }));
 
-        // When switching to/from the main window stack child, we need to
-        // modify the header bar to match
+        // When switching the main window stack child, we need to modify the
+        // header bar to match
         let h_bar: gtk::HeaderBar = gtk_builder.get_object("header_bar")
             .expect("Couldn't find header bar in ui file.");
         let h_accounts_button: gtk::Button = gtk_builder.get_object("header_accounts_button")
@@ -303,6 +303,50 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
 
         ri_voice_button.connect_clicked(clone!(act_voice_call => move |_| {
             act_voice_call.activate(None);
+        }));
+
+        // Set up markdown formatting toggling and notification
+        let act_toggle_markdown = gio::SimpleAction::new("toggle_markdown", None);
+        let _composer_entry: gtk::Entry = gtk_builder.get_object("composer_entry")
+            .expect("Couldn't find composer entry in ui file.");
+        let rvc_notif_revealer: gtk::Revealer = gtk_builder.get_object("rvc_notif_revealer")
+            .expect("Couldn't find chat notification revealer in ui file.");
+        let rvc_notif_label: gtk::Label = gtk_builder.get_object("rvc_notif_label")
+            .expect("Couldn't find chat notification label in ui file.");
+        let _rvc_notif_undo_button: gtk::Button = gtk_builder.get_object("rvc_notif_undo_button")
+            .expect("Couldn't find chat notification undo button in ui file.");
+        let rvc_notif_close_button: gtk::Button = gtk_builder.get_object("rvc_notif_close_button")
+            .expect("Couldn't find chat notification close button in ui file.");
+
+        act_toggle_markdown.connect_activate(clone!(
+            rvc_notif_label,
+            rvc_notif_revealer => move |_, _| {
+                // TODO: Toggle formatting and save with gsettings. Store new
+                // value in markdown_enabled.
+                let markdown_enabled = true;
+                let s = "Markdown formatting has been ";
+                let msg: String;
+
+                if markdown_enabled {
+                    msg = [s, "enabled."].join("");
+                } else {
+                    msg = [s, "disabled."].join("");
+                }
+
+                // TODO: Automatically dismiss the notification after a timeout?
+
+                rvc_notif_label.set_text(&msg);
+                rvc_notif_revealer.set_reveal_child(true);
+            }
+        ));
+        app.add_action(&act_toggle_markdown);
+
+        // TODO: Only activate accelerator when composer_entry is focused?
+        app.set_accels_for_action("app.toggle_markdown", &["<Ctl>m"]);
+        // TODO: Set up undo
+
+        rvc_notif_close_button.connect_clicked(clone!(rvc_notif_revealer => move |_| {
+            rvc_notif_revealer.set_reveal_child(false);
         }));
 
         // Set up greeter and related functions
