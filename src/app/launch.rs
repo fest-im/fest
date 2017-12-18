@@ -95,16 +95,18 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
 
         // Set up room pins toggle
         let act_toggle_room_pins = gio::SimpleAction::new("toggle_room_pins", None);
+        let pins_revealer: gtk::Revealer = gtk_builder.get_object("pins_revealer")
+            .expect("Couldn't find pins revealer in ui file.");
         let rd_pins_toggle: gtk::ToggleButton = gtk_builder.get_object("rd_pins_button")
             .expect("Couldn't find room pins button in ui file.");
 
-        act_toggle_room_pins.connect_activate(|_, _| {
-            // TODO: Toggle room's pinned messages
-        });
+        act_toggle_room_pins.connect_activate(clone!(rd_pins_toggle => move |_, _| {
+            rd_pins_toggle.clicked();
+        }));
         window.add_action(&act_toggle_room_pins);
 
-        rd_pins_toggle.connect_toggled(clone!(act_toggle_room_pins, rd_popover => move |_toggle| {
-            act_toggle_room_pins.activate(None);
+        rd_pins_toggle.connect_toggled(clone!(act_toggle_room_pins, rd_popover => move |toggle| {
+            pins_revealer.set_reveal_child(toggle.get_active());
             rd_popover.hide();
         }));
 
