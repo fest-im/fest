@@ -94,20 +94,11 @@ impl App {
             Continue(true)
         });
 
-        self.command_chan_tx
-            .send(Command::Connect {
-                homeserver_url: Url::parse("https://matrix.org").unwrap(),
-                connection_method: ConnectionMethod::Login {
-                    username: "TODO".to_owned(),
-                    password: "TODO".to_owned(),
-                },
-            })
-            .unwrap(); // TODO: How to handle background thread crash?
-
         // Run the main loop.
         self.gtk_app.run(&env::args().collect::<Vec<_>>());
 
         // Clean up
+        self.command_chan_tx.send(Command::Quit).unwrap();
         self.bg_thread_join_handle.join().unwrap();
     }
 }

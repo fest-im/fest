@@ -13,6 +13,7 @@ pub enum Command {
         homeserver_url: Url,
         connection_method: ConnectionMethod,
     },
+    Quit,
 }
 
 #[derive(Clone)]
@@ -53,19 +54,26 @@ fn bg_main<'a>(
             .map_err(|_| unreachable!())
             .and_then(|(opt_command, command_chan_rx)| match opt_command {
                 Some(command) => {
-                    let (homeserver_url, connection_method) = match command {
+                    Ok(match command {
                         Command::Connect { homeserver_url, connection_method }
-                            => (homeserver_url, connection_method),
+                            => future::Either::A((homeserver_url, connection_method, command_chan_rx)),
+                        Command::Quit => {
+                            // TODO...
+                            future::Either::B(())
+                        }
                         //_ => unimplemented!(),
-                    };
-
-                    Ok((homeserver_url, connection_method, command_chan_rx))
+                    })
                 }
                 None => Err(std::sync::mpsc::RecvError.into()),
-            }).and_then(move |(homeserver_url, connection_method, command_chan_rx)| {
+            }).and_then(move |x| -> Box<Future<Item = future::Loop<(), futures::sync::mpsc::Receiver<Command>>, Error = Error> + 'a> {
+                let (homeserver_url, connection_method, command_chan_rx) = match x {
+                    future::Either::A((a, b, c)) => (a, b, c),
+                    future::Either::B(_) => return box future::ok(future::Loop::Break(())),
+                };
+
                 let client = RumaClient::https(tokio_handle, homeserver_url, None).unwrap();
 
-                match connection_method {
+                box match connection_method {
                     ConnectionMethod::Login { username, password } => {
                         future::Either::A(client.log_in(username, password))
                     }
@@ -87,7 +95,12 @@ fn bg_main<'a>(
                         })
                     })
                 }).map_err(Error::from)
-                    //.select(command_chan_rx.into_future())
+                    // TODO: AFAIK select would always cancel the other future.
+                    // What we want is conditionally cancelling it, somehow.
+                    // (only cancel them if the user logs out or quits)
+                    /*.select(
+                        command_chan_rx.into_future().map_err(|_| unreachable!())
+                    )*/
             })
     })
 
