@@ -7,11 +7,11 @@ repository = "https://github.com/fest-im/fest"
 build = "build/build.rs"
 
 [dependencies]
-futures = "0.1.17"
+futures = "0.1.18"
 gio = "0.3.0"
-glib = "0.4.0"
-hyper = "0.11.6"
-tokio-core = "0.1.10"
+glib = "0.4.1"
+hyper = "0.11.16"
+tokio-core = "0.1.12"
 url = "1.6.0"
 
 [dependencies.gtk]
@@ -21,4 +21,3 @@ version = "0.3.0"
 [dependencies.ruma-client]
 git = "https://github.com/jplatte/ruma-client.git"
 branch = "synapse-workarounds"
-
