@@ -1,8 +1,8 @@
 use std;
 
 use futures;
+use futures::prelude::*;
 use futures::future::{self, Future, Loop};
-use futures::stream::Stream;
 use gtk;
 use ruma_client::{self, Client as RumaClient};
 use tokio_core::reactor::{Core as TokioCore, Handle as TokioHandle};
@@ -41,68 +41,89 @@ impl From<std::sync::mpsc::RecvError> for Error {
     }
 }
 
-fn bg_main<'a>(
-    tokio_handle: &'a TokioHandle,
+#[async]
+fn sync(
+    tokio_handle: TokioHandle,
+    homeserver_url: Url,
+    connection_method: ConnectionMethod,
+    _ui_dispatch_chan_tx: std::sync::mpsc::Sender<Box<Fn(&gtk::Builder) + Send>>,
+) -> Result<(), Error> {
+    let client = RumaClient::https(&tokio_handle, homeserver_url, None).unwrap();
+
+    match connection_method {
+        ConnectionMethod::Login { username, password } => {
+            await!(client.log_in(username, password))?;
+        }
+        ConnectionMethod::Guest => {
+            await!(client.register_guest())?;
+        }
+    }
+
+    future::loop_fn::<_, (), _, _>((), move |_| {
+        use ruma_client::api::r0::sync::sync_events;
+
+        sync_events::call(
+            client.clone(),
+            sync_events::Request {
+                filter: None,
+                since: None,
+                full_state: None,
+                set_presence: None,
+                timeout: None,
+            },
+        ).map(|res| {
+            println!("{:?}", res);
+
+            Loop::Continue(())
+        })
+    });
+
+    Ok(())
+}
+
+// TODO: This function should have Result::Error = Error, but we currently never
+// return Err(_) anywhere
+#[async]
+fn bg_main(
+    tokio_handle: TokioHandle,
     command_chan_rx: futures::sync::mpsc::Receiver<Command>,
     ui_dispatch_chan_tx: std::sync::mpsc::Sender<Box<Fn(&gtk::Builder) + Send>>,
-) -> impl Future<Item = (), Error = Error> + 'a {
-    future::loop_fn(command_chan_rx, move |command_chan_rx| {
-        command_chan_rx
-            .into_future()
-            // Some sort of error occurred that is not the channel being closed?! Error type is (),
-            // so it doesn't even impl Error. Assume this will never happen (for now).
-            .map_err(|_| unreachable!())
-            .and_then(|(opt_command, command_chan_rx)| match opt_command {
-                Some(command) => {
-                    Ok(match command {
-                        Command::Connect { homeserver_url, connection_method }
-                            => future::Either::A((homeserver_url, connection_method, command_chan_rx)),
-                        Command::Quit => {
-                            // TODO...
-                            future::Either::B(())
-                        }
-                        //_ => unimplemented!(),
-                    })
-                }
-                None => Err(std::sync::mpsc::RecvError.into()),
-            }).and_then(move |x| -> Box<Future<Item = future::Loop<(), futures::sync::mpsc::Receiver<Command>>, Error = Error> + 'a> {
-                let (homeserver_url, connection_method, command_chan_rx) = match x {
-                    future::Either::A((a, b, c)) => (a, b, c),
-                    future::Either::B(_) => return box future::ok(future::Loop::Break(())),
-                };
+) -> Result<(), ()> {
+    let (sync_cancel_chan_tx, sync_cancel_chan_rx) = futures::sync::oneshot::channel();
+    let mut sync_cancel_chan_rx = Some(sync_cancel_chan_rx);
 
-                let client = RumaClient::https(tokio_handle, homeserver_url, None).unwrap();
+    #[async]
+    for command in command_chan_rx {
+        match command {
+            Command::Connect {
+                homeserver_url,
+                connection_method,
+            } => {
+                tokio_handle.spawn(
+                    sync(
+                        tokio_handle.clone(),
+                        homeserver_url,
+                        connection_method,
+                        ui_dispatch_chan_tx.clone(),
+                    ).map_err(|_| ())
+                        .select(
+                            sync_cancel_chan_rx
+                                .take()
+                                .expect(
+                                    "Switching users after initial connection not yet implemented!",
+                                )
+                                .map_err(|_| ()),
+                        )
+                        .then(|_| Ok(())),
+                );
+            }
+            Command::Quit => break,
+        }
+    }
 
-                box match connection_method {
-                    ConnectionMethod::Login { username, password } => {
-                        future::Either::A(client.log_in(username, password))
-                    }
-                    ConnectionMethod::Guest => future::Either::B(client.register_guest()),
-                }.and_then(move |_| {
-                    future::loop_fn((), move |_| {
-                        use ruma_client::api::r0::sync::sync_events;
+    let _ = sync_cancel_chan_tx.send(());
 
-                        sync_events::call(client.clone(), sync_events::Request {
-                            filter: None,
-                            since: None,
-                            full_state: None,
-                            set_presence: None,
-                            timeout: None,
-                        }).map(|res| {
-                            println!("{:?}", res);
-
-                            Loop::Continue(())
-                        })
-                    })
-                }).map_err(Error::from)
-                    // TODO: AFAIK select would always cancel the other future.
-                    // What we want is conditionally cancelling it, somehow.
-                    // (only cancel them if the user logs out or quits)
-                    /*.select(
-                        command_chan_rx.into_future().map_err(|_| unreachable!())
-                    )*/
-            })
-    })
+    Ok(())
 
     /*ui_dispatch_chan_tx.send(box move |builder| {
         builder
@@ -124,7 +145,7 @@ pub fn run(
     let mut core = TokioCore::new().unwrap();
     let tokio_handle = core.handle();
 
-    match core.run(bg_main(&tokio_handle, command_chan_rx, ui_dispatch_chan_tx)) {
+    match core.run(bg_main(tokio_handle, command_chan_rx, ui_dispatch_chan_tx)) {
         Ok(_) => {}
         Err(e) => {
             // TODO: Show error message in UI. Quit / restart thread?

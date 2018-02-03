@@ -7,7 +7,7 @@ repository = "https://github.com/fest-im/fest"
 build = "build/build.rs"
 
 [dependencies]
-futures = "0.1.18"
+futures-await = "0.1.0"
 gio = "0.3.0"
 glib = "0.4.1"
 hyper = "0.11.16"

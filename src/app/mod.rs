@@ -9,9 +9,8 @@ use gio::prelude::*;
 use glib;
 use gtk;
 use gtk::prelude::*;
-use url::Url;
 
-use bg_thread::{self, Command, ConnectionMethod};
+use bg_thread;
 
 const APP_ID: &'static str = "org.fest-im.fest";
 
@@ -98,7 +97,11 @@ impl App {
         self.gtk_app.run(&env::args().collect::<Vec<_>>());
 
         // Clean up
-        self.command_chan_tx.send(Command::Quit).unwrap();
+
+        // TODO: This should end the loop in bg_thread::bg_main, but it doesn't seem to...
+        // self.command_chan_tx.close().unwrap();
+        // So for now, we have this extra variant in Command instead:
+        self.command_chan_tx.send(bg_thread::Command::Quit).unwrap();
         self.bg_thread_join_handle.join().unwrap();
     }
 }

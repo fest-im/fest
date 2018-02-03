@@ -1,8 +1,6 @@
-#![feature(box_syntax)]
-#![feature(conservative_impl_trait)]
-#![feature(clone_closures)]
+#![feature(box_syntax, conservative_impl_trait, clone_closures, generators, proc_macro)]
 
-extern crate futures;
+extern crate futures_await as futures;
 extern crate gio;
 extern crate glib;
 extern crate gtk;
