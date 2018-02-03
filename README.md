@@ -1,4 +1,4 @@
-# Fest <img src="/res/icons/hicolor/24x24/apps/fest.svg" height="24" width="24">
+# Fest ![Logo](/res/icons/hicolor/24x24/apps/fest.svg)
 
 [![GitHub stars][badge]][repo]
 
