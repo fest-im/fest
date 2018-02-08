@@ -105,7 +105,7 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
         }));
         window.add_action(&act_toggle_room_pins);
 
-        rd_pins_toggle.connect_toggled(clone!(act_toggle_room_pins, rd_popover => move |toggle| {
+        rd_pins_toggle.connect_toggled(clone!(pins_revealer, rd_popover => move |toggle| {
             pins_revealer.set_reveal_child(toggle.get_active());
             rd_popover.hide();
         }));
