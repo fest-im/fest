@@ -1,5 +1,4 @@
-#![feature(box_syntax, clone_closures, conservative_impl_trait, crate_in_paths, generators,
-           proc_macro)]
+#![feature(clone_closures, conservative_impl_trait, crate_in_paths, generators, proc_macro)]
 
 extern crate futures_await as futures;
 extern crate gio;
