@@ -1,9 +1,16 @@
+use futures::{self, Sink};
 use gio::{self, prelude::*};
 use gtk::{self, prelude::*};
 
+use crate::MatrixCommand;
+
 /// Connect signals which are activated when the application is launched.
-pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
-    gtk_app.connect_activate(clone!(gtk_builder => move |app| {
+pub(super) fn connect(
+    gtk_app: gtk::Application,
+    gtk_builder: gtk::Builder,
+    backend_chan_tx: futures::sync::mpsc::Sender<MatrixCommand>,
+) {
+    gtk_app.connect_activate(clone!(gtk_builder, backend_chan_tx => move |app| {
         // Add app actions
         // TODO: Implement prefs, shortcuts, and about actions
         let _act_prefs = gio::SimpleAction::new("preferences", None);
@@ -235,8 +242,11 @@ pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
         let lp_directory_button: gtk::Button = gtk_builder.get_object("lp_directory_button")
             .expect("Couldn't find directory button in ui file.");
 
-        act_show_dir_view.connect_activate(clone!(view_switcher => move |_, _| {
+        act_show_dir_view.connect_activate(clone!(view_switcher, backend_chan_tx => move |_, _| {
             view_switcher("directory_view", "Directory", "", Some("Back"));
+            // TODO: Do we want to handle send errors?
+            // TODO: Replace 0, it is just a dummy User ID
+            let _ = backend_chan_tx.clone().wait().send(MatrixCommand::FetchDirectory(0));
         }));
         window.add_action(&act_show_dir_view);
 

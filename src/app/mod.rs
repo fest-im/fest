@@ -27,7 +27,7 @@ pub struct App {
     /// Sender for the matrix channel.
     ///
     /// This channel is used to send commands to the background thread.
-    command_chan_tx: futures::sink::Wait<futures::sync::mpsc::Sender<MatrixCommand>>,
+    backend_chan_tx: futures::sink::Wait<futures::sync::mpsc::Sender<MatrixCommand>>,
 
     /// Channel receiver which allows to run actions from the matrix connection thread.
     ///
@@ -59,21 +59,24 @@ impl App {
 
         let gtk_builder = gtk::Builder::new_from_resource("/org/fest-im/fest/main_window.glade");
 
-        launch::connect(gtk_app.clone(), gtk_builder.clone());
+        let (backend_chan_tx, backend_chan_rx) = futures::sync::mpsc::channel(1);
 
-        let (command_chan_tx, command_chan_rx) = futures::sync::mpsc::channel(1);
-        let command_chan_tx = command_chan_tx.wait();
+        launch::connect(
+            gtk_app.clone(),
+            gtk_builder.clone(),
+            backend_chan_tx.clone(),
+        );
 
         // Create channel to allow the matrix connection thread to send closures to the main loop.
         let (frontend_chan_tx, frontend_chan_rx) = std::sync::mpsc::channel();
 
         let bg_thread_join_handle =
-            thread::spawn(move || run_bg_thread(command_chan_rx, frontend_chan_tx));
+            thread::spawn(move || run_bg_thread(backend_chan_rx, frontend_chan_tx));
 
         App {
             gtk_app,
             gtk_builder,
-            command_chan_tx,
+            backend_chan_tx: backend_chan_tx.wait(),
             frontend_chan_rx,
             bg_thread_join_handle,
         }
@@ -97,9 +100,9 @@ impl App {
         // Clean up
 
         // TODO: This should end the loop in bg_thread::bg_main, but it doesn't seem to...
-        // self.command_chan_tx.close().unwrap();
+        // self.backend_chan_tx.close().unwrap();
         // So for now, we have this extra variant in Command instead:
-        self.command_chan_tx.send(MatrixCommand::Quit).unwrap();
+        self.backend_chan_tx.send(MatrixCommand::Quit).unwrap();
         self.bg_thread_join_handle.join().unwrap();
     }
 }

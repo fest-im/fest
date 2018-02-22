@@ -1,4 +1,4 @@
-use std;
+use std::{self, cell::RefCell, collections::hash_map::{Entry as HashMapEntry, HashMap}, rc::Rc};
 
 use futures::{self, future::{self, Future, Loop}, prelude::*};
 use ruma_client::{self, Client as RumaClient};
@@ -7,19 +7,31 @@ use url::Url;
 
 use crate::FrontendCommand;
 
+// We refer to users with numerical IDs (a simple counter) internally, because
+// using the matrix user id to refer to users would involve a roundtrip to the
+// homeserver when registering as a guest.
+pub type InternalUserId = u32;
+
 pub enum Command {
     Connect {
         homeserver_url: Url,
         connection_method: ConnectionMethod,
     },
+    Disconnect(InternalUserId),
+    FetchDirectory(InternalUserId),
     Quit,
 }
 
-#[derive(Clone)]
 pub enum ConnectionMethod {
     Login { username: String, password: String },
     Guest,
     //Register,
+}
+
+pub struct UserMetadata {
+    homeserver: Option<String>,
+    username: Option<String>,
+    display_name: Option<String>,
 }
 
 #[derive(Debug)]
@@ -45,6 +57,7 @@ fn sync(
     tokio_handle: TokioHandle,
     homeserver_url: Url,
     connection_method: ConnectionMethod,
+    _user_metadata: Rc<RefCell<UserMetadata>>,
     _frontend_chan_tx: std::sync::mpsc::Sender<FrontendCommand>,
 ) -> Result<(), Error> {
     let client = RumaClient::https(&tokio_handle, homeserver_url, None).unwrap();
@@ -57,6 +70,8 @@ fn sync(
             await!(client.register_guest())?;
         }
     }
+
+    // TODO: Fill in user metadata
 
     future::loop_fn::<_, (), _, _>((), move |_| {
         use ruma_client::api::r0::sync::sync_events;
@@ -77,7 +92,7 @@ fn sync(
         })
     });
 
-    Ok(())
+    unreachable!()
 }
 
 // TODO: This function should have Result::Error = Error, but we currently never
@@ -85,54 +100,81 @@ fn sync(
 #[async]
 fn bg_main(
     tokio_handle: TokioHandle,
-    command_chan_rx: futures::sync::mpsc::Receiver<Command>,
+    backend_chan_rx: futures::sync::mpsc::Receiver<Command>,
     frontend_chan_tx: std::sync::mpsc::Sender<FrontendCommand>,
 ) -> Result<(), ()> {
-    let (sync_cancel_chan_tx, sync_cancel_chan_rx) = futures::sync::oneshot::channel();
-    let mut sync_cancel_chan_rx = Some(sync_cancel_chan_rx);
+    let mut next_user_id = 0;
+    let mut sync_cancel_chan_txs = HashMap::new();
+    let mut user_metadata_map = HashMap::new();
 
     #[async]
-    for command in command_chan_rx {
+    for command in backend_chan_rx {
         match command {
             Command::Connect {
                 homeserver_url,
                 connection_method,
             } => {
+                let (sync_cancel_chan_tx, sync_cancel_chan_rx) = futures::sync::oneshot::channel();
+                sync_cancel_chan_txs.insert(next_user_id, sync_cancel_chan_tx);
+
+                let user_metadata = Rc::new(RefCell::new(UserMetadata {
+                    // TODO: Can / should we obtain this another way? It is
+                    // probably possible to connect to a homeserver using its
+                    // IP or a secondary hostname.
+                    homeserver: homeserver_url.host_str().map(|host| host.to_owned()),
+                    username: match connection_method {
+                        ConnectionMethod::Login { ref username, .. } => Some(username.clone()),
+                        ConnectionMethod::Guest => None,
+                    },
+                    display_name: None,
+                }));
+                user_metadata_map.insert(next_user_id, user_metadata.clone());
+
                 tokio_handle.spawn(
                     sync(
                         tokio_handle.clone(),
                         homeserver_url,
                         connection_method,
+                        user_metadata,
                         frontend_chan_tx.clone(),
                     ).map_err(|_| ())
-                        .select(
-                            sync_cancel_chan_rx
-                                .take()
-                                .expect(
-                                    "Switching users after initial connection not yet implemented!",
-                                )
-                                .map_err(|_| ()),
-                        )
+                        .select(sync_cancel_chan_rx.map_err(|_| ()))
                         .then(|_| Ok(())),
                 );
+
+                next_user_id += 1;
             }
+            Command::Disconnect(user_id) => {
+                match sync_cancel_chan_txs.entry(user_id) {
+                    HashMapEntry::Vacant(_) => {
+                        // TODO: Log an error
+                    }
+                    HashMapEntry::Occupied(o) => {
+                        let (_, sync_cancel_chan_tx) = o.remove_entry();
+                        let _ = sync_cancel_chan_tx.send(());
+                    }
+                }
+            }
+            Command::FetchDirectory(_) => unimplemented!(),
             Command::Quit => break,
         }
     }
 
-    let _ = sync_cancel_chan_tx.send(());
+    for (_, sync_cancel_chan_tx) in sync_cancel_chan_txs {
+        let _ = sync_cancel_chan_tx.send(());
+    }
 
     Ok(())
 }
 
 pub fn run(
-    command_chan_rx: futures::sync::mpsc::Receiver<Command>,
+    backend_chan_rx: futures::sync::mpsc::Receiver<Command>,
     frontend_chan_tx: std::sync::mpsc::Sender<FrontendCommand>,
 ) {
     let mut core = TokioCore::new().unwrap();
     let tokio_handle = core.handle();
 
-    match core.run(bg_main(tokio_handle, command_chan_rx, frontend_chan_tx)) {
+    match core.run(bg_main(tokio_handle, backend_chan_rx, frontend_chan_tx)) {
         Ok(_) => {}
         Err(e) => {
             // TODO: Show error message in UI. Quit / restart thread?
