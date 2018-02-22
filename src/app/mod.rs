@@ -7,9 +7,11 @@ use gio::{self, prelude::*};
 use glib;
 use gtk::{self, prelude::*};
 
-use bg_thread;
+use crate::{run_bg_thread, MatrixCommand};
 
 const APP_ID: &'static str = "org.fest-im.fest";
+
+pub enum Command {}
 
 /// State for the main thread.
 ///
@@ -25,14 +27,14 @@ pub struct App {
     /// Sender for the matrix channel.
     ///
     /// This channel is used to send commands to the background thread.
-    command_chan_tx: futures::sink::Wait<futures::sync::mpsc::Sender<bg_thread::Command>>,
+    command_chan_tx: futures::sink::Wait<futures::sync::mpsc::Sender<MatrixCommand>>,
 
     /// Channel receiver which allows to run actions from the matrix connection thread.
     ///
     /// Long polling is required to receive messages from the rooms and so they have to
     /// run in separate threads.  In order to allow those threads to modify the gtk content,
-    /// they will send closures to the main thread using this channel.
-    ui_dispatch_chan_rx: std::sync::mpsc::Receiver<Box<Fn(&gtk::Builder) + Send>>,
+    /// they will send commands to the main thread using this channel.
+    frontend_chan_rx: std::sync::mpsc::Receiver<Command>,
 
     /// Matrix communication thread join handler used to clean up the tread when
     /// closing the application.
@@ -63,16 +65,16 @@ impl App {
         let command_chan_tx = command_chan_tx.wait();
 
         // Create channel to allow the matrix connection thread to send closures to the main loop.
-        let (ui_dispatch_chan_tx, ui_dispatch_chan_rx) = std::sync::mpsc::channel();
+        let (frontend_chan_tx, frontend_chan_rx) = std::sync::mpsc::channel();
 
         let bg_thread_join_handle =
-            thread::spawn(move || bg_thread::run(command_chan_rx, ui_dispatch_chan_tx));
+            thread::spawn(move || run_bg_thread(command_chan_rx, frontend_chan_tx));
 
         App {
             gtk_app,
             gtk_builder,
             command_chan_tx,
-            ui_dispatch_chan_rx,
+            frontend_chan_rx,
             bg_thread_join_handle,
         }
     }
@@ -80,11 +82,10 @@ impl App {
     pub fn run(mut self) {
         // Poll the matrix communication thread channel and run the closures to allow
         // the threads to run actions in the main loop.
-        let ui_dispatch_chan_rx = self.ui_dispatch_chan_rx;
-        let gtk_builder = self.gtk_builder;
+        let frontend_chan_rx = self.frontend_chan_rx;
         gtk::idle_add(move || {
-            if let Ok(dispatch_fn) = ui_dispatch_chan_rx.recv_timeout(Duration::from_millis(5)) {
-                dispatch_fn(&gtk_builder);
+            if let Ok(cmd) = frontend_chan_rx.recv_timeout(Duration::from_millis(5)) {
+                match cmd {}
             }
 
             Continue(true)
@@ -98,7 +99,7 @@ impl App {
         // TODO: This should end the loop in bg_thread::bg_main, but it doesn't seem to...
         // self.command_chan_tx.close().unwrap();
         // So for now, we have this extra variant in Command instead:
-        self.command_chan_tx.send(bg_thread::Command::Quit).unwrap();
+        self.command_chan_tx.send(MatrixCommand::Quit).unwrap();
         self.bg_thread_join_handle.join().unwrap();
     }
 }

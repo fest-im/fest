@@ -1,10 +1,11 @@
 use std;
 
 use futures::{self, future::{self, Future, Loop}, prelude::*};
-use gtk;
 use ruma_client::{self, Client as RumaClient};
 use tokio_core::reactor::{Core as TokioCore, Handle as TokioHandle};
 use url::Url;
+
+use crate::FrontendCommand;
 
 pub enum Command {
     Connect {
@@ -44,7 +45,7 @@ fn sync(
     tokio_handle: TokioHandle,
     homeserver_url: Url,
     connection_method: ConnectionMethod,
-    _ui_dispatch_chan_tx: std::sync::mpsc::Sender<Box<Fn(&gtk::Builder) + Send>>,
+    _frontend_chan_tx: std::sync::mpsc::Sender<FrontendCommand>,
 ) -> Result<(), Error> {
     let client = RumaClient::https(&tokio_handle, homeserver_url, None).unwrap();
 
@@ -85,7 +86,7 @@ fn sync(
 fn bg_main(
     tokio_handle: TokioHandle,
     command_chan_rx: futures::sync::mpsc::Receiver<Command>,
-    ui_dispatch_chan_tx: std::sync::mpsc::Sender<Box<Fn(&gtk::Builder) + Send>>,
+    frontend_chan_tx: std::sync::mpsc::Sender<FrontendCommand>,
 ) -> Result<(), ()> {
     let (sync_cancel_chan_tx, sync_cancel_chan_rx) = futures::sync::oneshot::channel();
     let mut sync_cancel_chan_rx = Some(sync_cancel_chan_rx);
@@ -102,7 +103,7 @@ fn bg_main(
                         tokio_handle.clone(),
                         homeserver_url,
                         connection_method,
-                        ui_dispatch_chan_tx.clone(),
+                        frontend_chan_tx.clone(),
                     ).map_err(|_| ())
                         .select(
                             sync_cancel_chan_rx
@@ -122,28 +123,16 @@ fn bg_main(
     let _ = sync_cancel_chan_tx.send(());
 
     Ok(())
-
-    /*ui_dispatch_chan_tx.send(box move |builder| {
-        builder
-            .get_object::<gtk::Stack>("user_button_stack")
-            .expect("Can't find user_button_stack in ui file.")
-            .set_visible_child_name("user_connected_page");
-
-        builder
-            .get_object::<gtk::Label>("display_name_label")
-            .expect("Can't find display_name_label in ui file.")
-            .set_text("Guest");
-    });*/
 }
 
 pub fn run(
     command_chan_rx: futures::sync::mpsc::Receiver<Command>,
-    ui_dispatch_chan_tx: std::sync::mpsc::Sender<Box<Fn(&gtk::Builder) + Send>>,
+    frontend_chan_tx: std::sync::mpsc::Sender<FrontendCommand>,
 ) {
     let mut core = TokioCore::new().unwrap();
     let tokio_handle = core.handle();
 
-    match core.run(bg_main(tokio_handle, command_chan_rx, ui_dispatch_chan_tx)) {
+    match core.run(bg_main(tokio_handle, command_chan_rx, frontend_chan_tx)) {
         Ok(_) => {}
         Err(e) => {
             // TODO: Show error message in UI. Quit / restart thread?

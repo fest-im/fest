@@ -1,4 +1,5 @@
-#![feature(box_syntax, conservative_impl_trait, clone_closures, generators, proc_macro)]
+#![feature(box_syntax, clone_closures, conservative_impl_trait, crate_in_paths, generators,
+           proc_macro)]
 
 extern crate futures_await as futures;
 extern crate gio;
@@ -15,9 +16,13 @@ mod util;
 mod app;
 mod bg_thread;
 
-use app::App;
+// Re-exports for use in other modules
+use app::Command as FrontendCommand;
+use bg_thread::{run as run_bg_thread, Command as MatrixCommand};
 
 fn main() {
+    use app::App;
+
     let app = App::new();
     app.run();
 }
