@@ -1,8 +1,6 @@
 use std;
 
-use futures;
-use futures::prelude::*;
-use futures::future::{self, Future, Loop};
+use futures::{self, future::{self, Future, Loop}, prelude::*};
 use gtk;
 use ruma_client::{self, Client as RumaClient};
 use tokio_core::reactor::{Core as TokioCore, Handle as TokioHandle};

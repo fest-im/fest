@@ -1,14 +1,11 @@
 mod launch;
 
-use std::{self, env, thread};
-use std::time::Duration;
+use std::{self, env, thread, time::Duration};
 
 use futures::{self, Sink};
-use gio;
-use gio::prelude::*;
+use gio::{self, prelude::*};
 use glib;
-use gtk;
-use gtk::prelude::*;
+use gtk::{self, prelude::*};
 
 use bg_thread;
 

@@ -1,7 +1,5 @@
-use gio;
-use gio::prelude::*;
-use gtk;
-use gtk::prelude::*;
+use gio::{self, prelude::*};
+use gtk::{self, prelude::*};
 
 /// Connect signals which are activated when the application is launched.
 pub(super) fn connect(gtk_app: gtk::Application, gtk_builder: gtk::Builder) {
