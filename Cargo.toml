@@ -7,16 +7,16 @@ repository = "https://github.com/fest-im/fest"
 build = "build/build.rs"
 
 [dependencies]
-futures-await = "0.1.0"
-gio = "0.3.0"
-glib = "0.4.1"
-hyper = "0.11.16"
-tokio-core = "0.1.12"
-url = "1.6.0"
+futures-await = "^0.1.0"
+gio = "^0.3.0"
+glib = "^0.4.1"
+hyper = "^0.11.16"
+tokio-core = "^0.1.12"
+url = "^1.6.0"
 
 [dependencies.gtk]
 features = ["v3_16"]
-version = "0.3.0"
+version = "^0.3.0"
 
 [dependencies.ruma-client]
 git = "https://github.com/jplatte/ruma-client.git"
