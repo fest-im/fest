@@ -1,18 +1,21 @@
-use std::{self, cell::RefCell, collections::hash_map::{Entry as HashMapEntry, HashMap}, rc::Rc};
+use std;
+use std::cell::RefCell;
+use std::collections::hash_map::{Entry as HashMapEntry, HashMap};
+use std::rc::Rc;
 
 use futures::{self, future::{self, Future, Loop}, prelude::*};
-use ruma_client::{self, Client as RumaClient};
-use tokio_core::reactor::{Core as TokioCore, Handle as TokioHandle};
+use ruma_client;
+use tokio_core;
 use url::Url;
 
-use crate::FrontendCommand;
+use crate::app::FrontendCommand;
 
 // We refer to users with numerical IDs (a simple counter) internally, because
 // using the matrix user id to refer to users would involve a roundtrip to the
 // homeserver when registering as a guest.
 pub type InternalUserId = u32;
 
-pub enum Command {
+pub enum MatrixCommand {
     Connect {
         homeserver_url: Url,
         connection_method: ConnectionMethod,
@@ -54,13 +57,13 @@ impl From<std::sync::mpsc::RecvError> for Error {
 
 #[async]
 fn sync(
-    tokio_handle: TokioHandle,
+    tokio_handle: tokio_core::reactor::Handle,
     homeserver_url: Url,
     connection_method: ConnectionMethod,
     _user_metadata: Rc<RefCell<UserMetadata>>,
     _frontend_chan_tx: std::sync::mpsc::Sender<FrontendCommand>,
 ) -> Result<(), Error> {
-    let client = RumaClient::https(&tokio_handle, homeserver_url, None).unwrap();
+    let client = ruma_client::Client::https(&tokio_handle, homeserver_url, None).unwrap();
 
     match connection_method {
         ConnectionMethod::Login { username, password } => {
@@ -99,8 +102,8 @@ fn sync(
 // return Err(_) anywhere
 #[async]
 fn bg_main(
-    tokio_handle: TokioHandle,
-    backend_chan_rx: futures::sync::mpsc::Receiver<Command>,
+    tokio_handle: tokio_core::reactor::Handle,
+    backend_chan_rx: futures::sync::mpsc::Receiver<MatrixCommand>,
     frontend_chan_tx: std::sync::mpsc::Sender<FrontendCommand>,
 ) -> Result<(), ()> {
     let mut next_user_id = 0;
@@ -110,7 +113,7 @@ fn bg_main(
     #[async]
     for command in backend_chan_rx {
         match command {
-            Command::Connect {
+            MatrixCommand::Connect {
                 homeserver_url,
                 connection_method,
             } => {
@@ -144,7 +147,7 @@ fn bg_main(
 
                 next_user_id += 1;
             }
-            Command::Disconnect(user_id) => {
+            MatrixCommand::Disconnect(user_id) => {
                 match sync_cancel_chan_txs.entry(user_id) {
                     HashMapEntry::Vacant(_) => {
                         // TODO: Log an error
@@ -155,8 +158,8 @@ fn bg_main(
                     }
                 }
             }
-            Command::FetchDirectory(_) => unimplemented!(),
-            Command::Quit => break,
+            MatrixCommand::FetchDirectory(_) => unimplemented!(),
+            MatrixCommand::Quit => break,
         }
     }
 
@@ -168,10 +171,10 @@ fn bg_main(
 }
 
 pub fn run(
-    backend_chan_rx: futures::sync::mpsc::Receiver<Command>,
+    backend_chan_rx: futures::sync::mpsc::Receiver<MatrixCommand>,
     frontend_chan_tx: std::sync::mpsc::Sender<FrontendCommand>,
 ) {
-    let mut core = TokioCore::new().unwrap();
+    let mut core = tokio_core::reactor::Core::new().unwrap();
     let tokio_handle = core.handle();
 
     match core.run(bg_main(tokio_handle, backend_chan_rx, frontend_chan_tx)) {
