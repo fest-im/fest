@@ -7,11 +7,11 @@ use gio::{self, prelude::*};
 use glib;
 use gtk::{self, prelude::*};
 
-use crate::{run_bg_thread, MatrixCommand};
+use crate::bg_thread::{self, MatrixCommand};
 
 const APP_ID: &'static str = "org.fest-im.fest";
 
-pub enum Command {}
+pub enum FrontendCommand {}
 
 /// State for the main thread.
 ///
@@ -34,7 +34,7 @@ pub struct App {
     /// Long polling is required to receive messages from the rooms and so they have to
     /// run in separate threads.  In order to allow those threads to modify the gtk content,
     /// they will send commands to the main thread using this channel.
-    frontend_chan_rx: std::sync::mpsc::Receiver<Command>,
+    frontend_chan_rx: std::sync::mpsc::Receiver<FrontendCommand>,
 
     /// Matrix communication thread join handler used to clean up the tread when
     /// closing the application.
@@ -71,7 +71,7 @@ impl App {
         let (frontend_chan_tx, frontend_chan_rx) = std::sync::mpsc::channel();
 
         let bg_thread_join_handle =
-            thread::spawn(move || run_bg_thread(backend_chan_rx, frontend_chan_tx));
+            thread::spawn(move || bg_thread::run(backend_chan_rx, frontend_chan_tx));
 
         App {
             gtk_app,

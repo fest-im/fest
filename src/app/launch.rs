@@ -2,7 +2,7 @@ use futures::{self, Sink};
 use gio::{self, prelude::*};
 use gtk::{self, prelude::*};
 
-use crate::MatrixCommand;
+use crate::bg_thread::MatrixCommand;
 
 /// Connect signals which are activated when the application is launched.
 pub(super) fn connect(
