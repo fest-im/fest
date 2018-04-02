@@ -89,7 +89,7 @@ fn sync(
                 timeout: None,
             },
         ).map(|res| {
-            println!("{:?}", res);
+            trace!("synchronization response: {:?}", res);
 
             Loop::Continue(())
         })
@@ -140,17 +140,23 @@ fn bg_main(
                         connection_method,
                         user_metadata,
                         frontend_chan_tx.clone(),
-                    ).map_err(|_| ())
-                        .select(sync_cancel_chan_rx.map_err(|_| ()))
-                        .then(|_| Ok(())),
+                    ).map_err(|e| {
+                        error!("an error occured when trying to sync with the homeserver: {:?}", e);
+                    }).select(sync_cancel_chan_rx.map_err(|e| {
+                        error!("some error occured with a rx sync channel: {}", e);
+                    }))
+                    .then(|_| {
+                        debug!("successfully connected to the matrix homeserver");
+                        Ok(())
+                    }),
                 );
 
                 next_user_id += 1;
             }
             MatrixCommand::Disconnect(user_id) => {
                 match sync_cancel_chan_txs.entry(user_id) {
-                    HashMapEntry::Vacant(_) => {
-                        // TODO: Log an error
+                    HashMapEntry::Vacant(v) => {
+                        error!("no sync for user_id {}, entry is vacant: {:?}", user_id, v);
                     }
                     HashMapEntry::Occupied(o) => {
                         let (_, sync_cancel_chan_tx) = o.remove_entry();
@@ -181,7 +187,7 @@ pub fn run(
         Ok(_) => {}
         Err(e) => {
             // TODO: Show error message in UI. Quit / restart thread?
-            eprintln!("fest: background thread error: {:?}", e);
+            error!("fest: background thread error (and the ui doesn't show anything) : {:?}", e);
         }
     };
 }

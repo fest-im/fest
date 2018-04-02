@@ -40,6 +40,8 @@ pub(crate) fn set_up_logging() {
         .apply().unwrap();
 
     debug!("finished setting up logging! yay!");
+    trace!("*tap* *tap* is this thing on? test test");
+
 }
 
 
