@@ -10,6 +10,9 @@ extern crate tokio_core;
 extern crate url;
 
 #[macro_use]
+extern crate log;
+
+#[macro_use]
 mod util;
 
 mod app;
@@ -18,6 +21,7 @@ mod bg_thread;
 fn main() {
     use app::App;
 
+    util::set_up_logging();
     let app = App::new();
     app.run();
 }
