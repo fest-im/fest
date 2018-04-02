@@ -15,10 +15,6 @@ mod util;
 mod app;
 mod bg_thread;
 
-// Re-exports for use in other modules
-use app::Command as FrontendCommand;
-use bg_thread::{run as run_bg_thread, Command as MatrixCommand};
-
 fn main() {
     use app::App;
 
