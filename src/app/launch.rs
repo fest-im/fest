@@ -433,6 +433,7 @@ pub(super) fn connect(
 
         // Set up window configuration
         window.set_title("Fest");
+        window.set_icon_name("fest");
 
         // Associate window with the Application and show it
         window.set_application(Some(app));
