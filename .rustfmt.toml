@@ -1,0 +1,7 @@
+# For some reason, imports use visual indentation by default while everything
+# else is block-indented by default. Change imports to also be block-indented.
+imports_indent = "Block"
+
+# The items inside of an import should always all be on one line, or each have
+# their own line.
+imports_layout = "HorizontalVertical"
