@@ -141,29 +141,31 @@ fn bg_main(
                         user_metadata,
                         frontend_chan_tx.clone(),
                     ).map_err(|e| {
-                        error!("an error occured when trying to sync with the homeserver: {:?}", e);
-                    }).select(sync_cancel_chan_rx.map_err(|e| {
-                        error!("some error occured with a rx sync channel: {}", e);
-                    }))
-                    .then(|_| {
-                        debug!("successfully connected to the matrix homeserver");
-                        Ok(())
-                    }),
+                        error!(
+                            "an error occured when trying to sync with the homeserver: {:?}",
+                            e
+                        );
+                    })
+                        .select(sync_cancel_chan_rx.map_err(|e| {
+                            error!("some error occured with a rx sync channel: {}", e);
+                        }))
+                        .then(|_| {
+                            debug!("successfully connected to the matrix homeserver");
+                            Ok(())
+                        }),
                 );
 
                 next_user_id += 1;
             }
-            MatrixCommand::Disconnect(user_id) => {
-                match sync_cancel_chan_txs.entry(user_id) {
-                    HashMapEntry::Vacant(v) => {
-                        error!("no sync for user_id {}, entry is vacant: {:?}", user_id, v);
-                    }
-                    HashMapEntry::Occupied(o) => {
-                        let (_, sync_cancel_chan_tx) = o.remove_entry();
-                        let _ = sync_cancel_chan_tx.send(());
-                    }
+            MatrixCommand::Disconnect(user_id) => match sync_cancel_chan_txs.entry(user_id) {
+                HashMapEntry::Vacant(v) => {
+                    error!("no sync for user_id {}, entry is vacant: {:?}", user_id, v);
                 }
-            }
+                HashMapEntry::Occupied(o) => {
+                    let (_, sync_cancel_chan_tx) = o.remove_entry();
+                    let _ = sync_cancel_chan_tx.send(());
+                }
+            },
             MatrixCommand::FetchDirectory(_) => unimplemented!(),
             MatrixCommand::Quit => break,
         }
@@ -187,7 +189,10 @@ pub fn run(
         Ok(_) => {}
         Err(e) => {
             // TODO: Show error message in UI. Quit / restart thread?
-            error!("fest: background thread error (and the ui doesn't show anything) : {:?}", e);
+            error!(
+                "fest: background thread error (and the ui doesn't show anything) : {:?}",
+                e
+            );
         }
     };
 }

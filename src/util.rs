@@ -41,9 +41,7 @@ pub(crate) fn set_up_logging() {
 
     debug!("finished setting up logging! yay!");
     trace!("*tap* *tap* is this thing on? test test");
-
 }
-
 
 /// creates a `fern::Dispatch` object. if the 'logging_color' feature is enabled, it outputs
 /// ansi escape sequencen to color the logs.
@@ -62,34 +60,34 @@ fn set_up_fern_dispatch() -> fern::Dispatch {
     // configure colors for the name of the level.
     // since almost all of them are the some as the color for the whole line, we just clone
     // `colors_line` and overwrite our changes
-    let colors_level = colors_line.clone()
-        .info(Color::Green);
+    let colors_level = colors_line.clone().info(Color::Green);
     // here we set up our fern Dispatch
-    fern::Dispatch::new()
-        .format(move |out, message, record| {
-            out.finish(format_args!(
-                "{color_line}[{date}][{target}][{level}{color_line}] {message}\x1B[0m",
-                color_line = format_args!("\x1B[{}m", colors_line.get_color(&record.level()).to_fg_str()),
-                date = chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
-                target = record.target(),
-                level = colors_level.color(record.level()),
-                message = message,
-            ));
-        })
+    fern::Dispatch::new().format(move |out, message, record| {
+        out.finish(format_args!(
+            "{color_line}[{date}][{target}][{level}{color_line}] {message}\x1B[0m",
+            color_line = format_args!(
+                "\x1B[{}m",
+                colors_line.get_color(&record.level()).to_fg_str()
+            ),
+            date = chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+            target = record.target(),
+            level = colors_level.color(record.level()),
+            message = message,
+        ));
+    })
 }
 
 /// creates a `fern::Dispatch` object. if the 'logging_color' feature is enabled, it outputs
 /// ansi escape sequencen to color the logs.
 #[cfg(not(feature = "logging_color"))]
 fn set_up_fern_dispatch() -> fern::Dispatch {
-    fern::Dispatch::new()
-        .format(move |out, message, record| {
-            out.finish(format_args!(
-                "[{date}][{target}][{level}] {message}",
-                date = chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
-                target = record.target(),
-                level = record.level(),
-                message = message,
-            ));
-        })
+    fern::Dispatch::new().format(move |out, message, record| {
+        out.finish(format_args!(
+            "[{date}][{target}][{level}] {message}",
+            date = chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+            target = record.target(),
+            level = record.level(),
+            message = message,
+        ));
+    })
 }
