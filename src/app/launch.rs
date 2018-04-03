@@ -14,8 +14,8 @@ pub(super) fn connect(
         // Add app actions
         // TODO: Implement prefs, shortcuts, and about actions
         let _act_prefs = gio::SimpleAction::new("preferences", None);
-        let _act_shortcuts = gio::SimpleAction::new("shortcuts", None);
-        let _act_about = gio::SimpleAction::new("about", None);
+        let act_shortcuts = gio::SimpleAction::new("shortcuts", None);
+        let act_about = gio::SimpleAction::new("about", None);
         let act_quit = gio::SimpleAction::new("quit", None);
 
         act_quit.connect_activate(clone!(app => move |_, _| {
@@ -38,6 +38,48 @@ pub(super) fn connect(
             .expect("Couldn't find room view stack in ui file.");
         let window: gtk::ApplicationWindow = gtk_builder.get_object("main_window")
             .expect("Couldn't find main_window in ui file.");
+        
+        // This shortcut window is for backwards compat with gtk 3.16, 
+        // when new version is used (>= 3.20), it can be
+        // replaced with ```win.show-help-overlay``` in action of
+        // Keyboard shortcuts in menus.ui
+        
+        // Parts mentioning shortcuts here can be then removed
+        
+        act_shortcuts.connect_activate(clone!(app => move |_, _| {
+            let dialog: gtk::Window = gtk::Builder::new_from_resource("/org/fest-im/fest/gtk/help-overlay-old.ui")
+                .get_object("help_overlay_old")
+                .expect("Couldn't find help_overlay_old in ui file.");
+
+            dialog.show();
+        }));
+        act_about.connect_activate(clone!(window => move |_, _| {
+
+            let dialog = gtk::AboutDialog::new();
+
+            dialog.set_modal(true);
+            dialog.set_transient_for(&window);
+            dialog.set_logo_icon_name("fest");
+            dialog.set_program_name("Fest");
+            dialog.set_version(env!("CARGO_PKG_VERSION"));
+            dialog.set_website_label("Contribute to Fest");
+            dialog.set_website("https://github.com/fest-im/fest");
+            dialog.set_license_type(gtk::License::Gpl30);
+
+            dialog.set_artists(&[
+                "Stasiek Michalski <hellcp@opensuse.org>",
+             ]);
+
+            dialog.set_authors(&[
+                "Andrew Conrad",
+                "Jonas Platte",
+            ]);
+
+            dialog.show();
+        }));
+        
+        app.add_action(&act_shortcuts);
+        app.add_action(&act_about);
 
         // Reset certain widgets to their default state when hidden
         rd_popover.connect_hide(clone!(rd_stack => move |_| {
