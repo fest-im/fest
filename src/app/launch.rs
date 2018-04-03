@@ -38,14 +38,14 @@ pub(super) fn connect(
             .expect("Couldn't find room view stack in ui file.");
         let window: gtk::ApplicationWindow = gtk_builder.get_object("main_window")
             .expect("Couldn't find main_window in ui file.");
-        
-        // This shortcut window is for backwards compat with gtk 3.16, 
+
+        // This shortcut window is for backwards compat with gtk 3.16,
         // when new version is used (>= 3.20), it can be
         // replaced with ```win.show-help-overlay``` in action of
         // Keyboard shortcuts in menus.ui
-        
+
         // Parts mentioning shortcuts here can be then removed
-        
+
         act_shortcuts.connect_activate(clone!(app => move |_, _| {
             let dialog: gtk::Window = gtk::Builder::new_from_resource("/org/fest-im/fest/gtk/help-overlay-old.ui")
                 .get_object("help_overlay_old")
@@ -54,7 +54,6 @@ pub(super) fn connect(
             dialog.show();
         }));
         act_about.connect_activate(clone!(window => move |_, _| {
-
             let dialog = gtk::AboutDialog::new();
 
             dialog.set_modal(true);
@@ -68,7 +67,7 @@ pub(super) fn connect(
 
             dialog.set_artists(&[
                 "Stasiek Michalski <hellcp@opensuse.org>",
-             ]);
+            ]);
 
             dialog.set_authors(&[
                 "Andrew Conrad",
@@ -77,7 +76,7 @@ pub(super) fn connect(
 
             dialog.show();
         }));
-        
+
         app.add_action(&act_shortcuts);
         app.add_action(&act_about);
 
