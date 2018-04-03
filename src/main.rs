@@ -5,7 +5,10 @@ extern crate gio;
 extern crate glib;
 extern crate gtk;
 extern crate hyper;
+extern crate hyper_tls;
 extern crate ruma_client;
+extern crate ruma_events;
+extern crate ruma_identifiers;
 extern crate tokio_core;
 extern crate url;
 

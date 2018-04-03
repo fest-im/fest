@@ -2,7 +2,7 @@ use futures::{self, Sink};
 use gio::{self, prelude::*};
 use gtk::{self, prelude::*};
 
-use crate::bg_thread::MatrixCommand;
+use crate::bg_thread::{MatrixCommand, UserSpecificCommand};
 
 /// Connect signals which are activated when the application is launched.
 pub(super) fn connect(
@@ -287,7 +287,10 @@ pub(super) fn connect(
             view_switcher("directory_view", "Directory", "", Some("Back"));
             // TODO: Do we want to handle send errors?
             // TODO: Replace 0, it is just a dummy User ID
-            let _ = backend_chan_tx.clone().wait().send(MatrixCommand::FetchDirectory(0));
+            let _ = backend_chan_tx.clone().wait().send(MatrixCommand::UserSpecificCommand {
+                user_id: 0,
+                command: UserSpecificCommand::FetchDirectory,
+            });
         }));
         window.add_action(&act_show_dir_view);
 

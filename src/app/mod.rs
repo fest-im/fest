@@ -6,12 +6,20 @@ use futures::{self, Sink};
 use gio::{self, prelude::*};
 use glib;
 use gtk::{self, prelude::*};
+use ruma_identifiers::RoomId;
 
 use crate::bg_thread::{self, MatrixCommand};
 
 const APP_ID: &'static str = "org.fest-im.fest";
 
-pub enum FrontendCommand {}
+pub enum FrontendCommand {
+    DisplayTextMessage {
+        room_id: RoomId,
+        author_name: String,
+        // [...]
+        message_content: String,
+    },
+}
 
 /// State for the main thread.
 ///
@@ -88,7 +96,15 @@ impl App {
         let frontend_chan_rx = self.frontend_chan_rx;
         gtk::idle_add(move || {
             if let Ok(cmd) = frontend_chan_rx.recv_timeout(Duration::from_millis(5)) {
-                match cmd {}
+                match cmd {
+                    FrontendCommand::DisplayTextMessage {
+                        room_id,
+                        author_name,
+                        message_content,
+                    } => {
+                        // TODO!
+                    }
+                }
             }
 
             Continue(true)

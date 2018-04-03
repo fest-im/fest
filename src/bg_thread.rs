@@ -4,7 +4,14 @@ use std::collections::hash_map::{Entry as HashMapEntry, HashMap};
 use std::rc::Rc;
 
 use futures::{self, future::{self, Future, Loop}, prelude::*};
-use ruma_client;
+use hyper::client::HttpConnector;
+use hyper_tls::HttpsConnector;
+use ruma_client::{self, api::r0};
+use ruma_events::{
+    EventType,
+    room::message::{MessageEventContent, MessageType, TextMessageEventContent},
+};
+use ruma_identifiers::RoomId;
 use tokio_core;
 use url::Url;
 
@@ -20,9 +27,23 @@ pub enum MatrixCommand {
         homeserver_url: Url,
         connection_method: ConnectionMethod,
     },
+    // This is not a UserSpecificCommand because it deletes user data rather
+    // than just accessing it.
     Disconnect(InternalUserId),
-    FetchDirectory(InternalUserId),
+    UserSpecificCommand {
+        user_id: InternalUserId,
+        command: UserSpecificCommand,
+    },
     Quit,
+}
+
+pub enum UserSpecificCommand {
+    FetchDirectory,
+    SendTextMessage {
+        room_id: RoomId,
+        message_content: String,
+    },
+    // [...]
 }
 
 pub enum ConnectionMethod {
@@ -31,46 +52,31 @@ pub enum ConnectionMethod {
     //Register,
 }
 
-pub struct UserMetadata {
+pub struct UserData {
+    client: ruma_client::Client<HttpsConnector<HttpConnector>>,
     homeserver: Option<String>,
     username: Option<String>,
     display_name: Option<String>,
 }
 
-#[derive(Debug)]
-enum Error {
-    RumaClientError(ruma_client::Error),
-    RecvError(std::sync::mpsc::RecvError),
-}
-
-impl From<ruma_client::Error> for Error {
-    fn from(err: ruma_client::Error) -> Error {
-        Error::RumaClientError(err)
-    }
-}
-
-impl From<std::sync::mpsc::RecvError> for Error {
-    fn from(err: std::sync::mpsc::RecvError) -> Error {
-        Error::RecvError(err)
-    }
-}
-
 #[async]
 fn sync(
-    tokio_handle: tokio_core::reactor::Handle,
-    homeserver_url: Url,
     connection_method: ConnectionMethod,
-    _user_metadata: Rc<RefCell<UserMetadata>>,
+    user_data: Rc<RefCell<UserData>>,
     _frontend_chan_tx: std::sync::mpsc::Sender<FrontendCommand>,
-) -> Result<(), Error> {
-    let client = ruma_client::Client::https(&tokio_handle, homeserver_url, None).unwrap();
+) -> Result<(), ()> {
+    let client = user_data.borrow().client.clone();
 
     match connection_method {
         ConnectionMethod::Login { username, password } => {
-            await!(client.log_in(username, password))?;
+            await!(client.log_in(username.clone(), password)).map_err(|e| {
+                error!("Failed to log in as {}: {:?}", username, e);
+            })?;
         }
         ConnectionMethod::Guest => {
-            await!(client.register_guest())?;
+            await!(client.register_guest()).map_err(|e| {
+                error!("Failed to log in as guest: {:?}", e);
+            })?;
         }
     }
 
@@ -98,6 +104,48 @@ fn sync(
     unreachable!()
 }
 
+#[async]
+fn fetch_directory(
+    _user_data: Rc<RefCell<UserData>>,
+    _frontend_chan_tx: std::sync::mpsc::Sender<FrontendCommand>,
+) -> Result<(), ()> {
+    unimplemented!()
+}
+
+#[async]
+fn send_text_message(
+    user_data: Rc<RefCell<UserData>>,
+    frontend_chan_tx: std::sync::mpsc::Sender<FrontendCommand>,
+    room_id: RoomId,
+    message_content: String,
+) -> Result<(), ()> {
+    // TODO: Indicate that the server hasn't received the message yet?
+    // TODO: Handle channel send errors?
+    let _ = frontend_chan_tx.send(FrontendCommand::DisplayTextMessage {
+        room_id: room_id.clone(),
+        author_name: user_data.borrow().username.clone().ok_or_else(|| {
+            error!("send_text_message: UserData::username not set!");
+        })?,
+        message_content: message_content.clone(),
+    });
+
+    await!(r0::send::send_message_event::call(
+        user_data.borrow().client.clone(),
+        r0::send::send_message_event::Request {
+            room_id: room_id.clone(),
+            event_type: EventType::RoomMessage,
+            txn_id: "1".to_owned(),
+            data: MessageEventContent::Text(TextMessageEventContent {
+                body: message_content,
+                msgtype: MessageType::Text,
+            }),
+        }
+    )).map(|_| {})
+        .map_err(|e| {
+            error!("Sending a text message to {} failed: {:?}", room_id, e);
+        })
+}
+
 // TODO: This function should have Result::Error = Error, but we currently never
 // return Err(_) anywhere
 #[async]
@@ -108,7 +156,7 @@ fn bg_main(
 ) -> Result<(), ()> {
     let mut next_user_id = 0;
     let mut sync_cancel_chan_txs = HashMap::new();
-    let mut user_metadata_map = HashMap::new();
+    let mut user_data_map = HashMap::new();
 
     #[async]
     for command in backend_chan_rx {
@@ -120,7 +168,12 @@ fn bg_main(
                 let (sync_cancel_chan_tx, sync_cancel_chan_rx) = futures::sync::oneshot::channel();
                 sync_cancel_chan_txs.insert(next_user_id, sync_cancel_chan_tx);
 
-                let user_metadata = Rc::new(RefCell::new(UserMetadata {
+                let client =
+                    ruma_client::Client::https(&tokio_handle, homeserver_url.clone(), None)
+                        .unwrap();
+
+                let user_data = Rc::new(RefCell::new(UserData {
+                    client,
                     // TODO: Can / should we obtain this another way? It is
                     // probably possible to connect to a homeserver using its
                     // IP or a secondary hostname.
@@ -131,42 +184,60 @@ fn bg_main(
                     },
                     display_name: None,
                 }));
-                user_metadata_map.insert(next_user_id, user_metadata.clone());
+                user_data_map.insert(next_user_id, user_data.clone());
 
                 tokio_handle.spawn(
-                    sync(
-                        tokio_handle.clone(),
-                        homeserver_url,
-                        connection_method,
-                        user_metadata,
-                        frontend_chan_tx.clone(),
-                    ).map_err(|e| {
-                        error!(
-                            "an error occured when trying to sync with the homeserver: {:?}",
-                            e
-                        );
-                    })
+                    sync(connection_method, user_data, frontend_chan_tx.clone())
                         .select(sync_cancel_chan_rx.map_err(|e| {
                             error!("some error occured with a rx sync channel: {}", e);
                         }))
-                        .then(|_| {
-                            debug!("successfully connected to the matrix homeserver");
-                            Ok(())
-                        }),
+                        .map(|_| {
+                            // sync never terminates successfully
+                            unreachable!()
+                        })
+                        .map_err(|_| ()),
                 );
 
                 next_user_id += 1;
             }
             MatrixCommand::Disconnect(user_id) => match sync_cancel_chan_txs.entry(user_id) {
-                HashMapEntry::Vacant(v) => {
-                    error!("no sync for user_id {}, entry is vacant: {:?}", user_id, v);
+                HashMapEntry::Vacant(_) => {
+                    error!("Tried to disconnect unknown user with user_id {}!", user_id);
                 }
                 HashMapEntry::Occupied(o) => {
                     let (_, sync_cancel_chan_tx) = o.remove_entry();
                     let _ = sync_cancel_chan_tx.send(());
                 }
             },
-            MatrixCommand::FetchDirectory(_) => unimplemented!(),
+            MatrixCommand::UserSpecificCommand { user_id, command } => {
+                match user_data_map.get(&user_id) {
+                    Some(user_data) => match command {
+                        UserSpecificCommand::FetchDirectory => {
+                            tokio_handle.spawn(fetch_directory(
+                                user_data.clone(),
+                                frontend_chan_tx.clone(),
+                            ));
+                        }
+                        UserSpecificCommand::SendTextMessage {
+                            room_id,
+                            message_content,
+                        } => {
+                            tokio_handle.spawn(send_text_message(
+                                user_data.clone(),
+                                frontend_chan_tx.clone(),
+                                room_id,
+                                message_content,
+                            ));
+                        }
+                    },
+                    None => {
+                        error!(
+                            "UserSpecificCommand requested for unknown user with user_id {}",
+                            user_id
+                        );
+                    }
+                }
+            }
             MatrixCommand::Quit => break,
         }
     }
@@ -187,12 +258,9 @@ pub fn run(
 
     match core.run(bg_main(tokio_handle, backend_chan_rx, frontend_chan_tx)) {
         Ok(_) => {}
-        Err(e) => {
+        Err(()) => {
             // TODO: Show error message in UI. Quit / restart thread?
-            error!(
-                "fest: background thread error (and the ui doesn't show anything) : {:?}",
-                e
-            );
+            error!("background thread crashed!");
         }
     };
 }
