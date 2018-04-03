@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <object class="GtkShortcutsWindow" id="help_overlay">
+    <property name="modal">true</property>
+    <child>
+      <object class="GtkShortcutsSection">
+        <property name="visible">true</property>
+        <property name="section-name">shortcuts</property>
+        <property name="max-height">10</property>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="visible">true</property>
+            <property name="title" translatable="yes">General</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="accelerator">&lt;ctrl&gt;u</property>
+                <property name="title" translatable="yes">Show User Menu</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="title" translatable="yes" context="shortcut window">Switch to Room</property>
+                <property name="accelerator">F2</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="accelerator">F3</property>
+                <property name="title" translatable="yes">Switch to Room Directory</property>
+              </object>
+            </child>
+             <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="title" translatable="yes" context="shortcut window">Toggle Right Panel</property>
+                <property name="accelerator">F6</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="title" translatable="yes" context="shortcut window">Toggle Room Pins</property>
+                <property name="accelerator">F7</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="title" translatable="yes" context="shortcut window">Quit</property>
+                <property name="accelerator">&lt;Primary&gt;q</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="title" translatable="yes" context="shortcut window">Keyboard Shortcuts</property>
+                <property name="accelerator">&lt;ctrl&gt;&lt;shift&gt;question</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="visible">true</property>
+            <property name="title" translatable="yes">Room Interactions</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="accelerator">&lt;ctrl&gt;&lt;shift&gt;a</property>
+                <property name="title" translatable="yes">Attach File</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="accelerator">&lt;ctrl&gt;&lt;shift&gt;v</property>
+                <property name="title" translatable="yes">Start Video Call</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="title" translatable="yes" context="shortcut window">Start Voice Call</property>
+                <property name="accelerator">&lt;ctrl&gt;&lt;shift&gt;c</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="title" translatable="yes" context="shortcut window">Toggle Markdown</property>
+                <property name="accelerator">&lt;ctrl&gt;m</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="accelerator">&lt;ctrl&gt;i</property>
+                <property name="title" translatable="yes">Invite to Current Room</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">true</property>
+                <property name="accelerator">&lt;ctrl&gt;l</property>
+                <property name="title" translatable="yes">Leave Current Room</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
