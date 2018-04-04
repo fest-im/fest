@@ -179,11 +179,13 @@ fn bg_main(
                         .select(sync_cancel_chan_rx.map_err(|e| {
                             error!("some error occured with a rx sync channel: {}", e);
                         }))
-                        .map(|_| {
-                            // sync never terminates successfully
-                            unreachable!()
-                        })
-                        .map_err(|_| ()),
+                        .then(|_| {
+                            // Sync never terminates successfully, so we only reach this when an
+                            // error occurs (which is logged inside sync), the sync is cancelled
+                            // or receiving a message from sync_cancel_chan_rx failed (logged in
+                            // map_err above). We don't want to do anything in any of those cases.
+                            Ok(())
+                        }),
                 );
 
                 next_user_id += 1;
