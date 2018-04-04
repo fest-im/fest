@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use std::collections::hash_map::{Entry as HashMapEntry, HashMap};
 use std::rc::Rc;
 
-use futures::{self, future::{self, Future, Loop}, prelude::*};
+use futures::{self, prelude::*};
 use hyper::client::HttpConnector;
 use hyper_tls::HttpsConnector;
 use ruma_client::{self, api::r0};
@@ -82,24 +82,12 @@ fn sync(
 
     // TODO: Fill in user metadata
 
-    future::loop_fn::<_, (), _, _>((), move |_| {
-        use ruma_client::api::r0::sync::sync_events;
-
-        sync_events::call(
-            client.clone(),
-            sync_events::Request {
-                filter: None,
-                since: None,
-                full_state: None,
-                set_presence: None,
-                timeout: None,
-            },
-        ).map(|res| {
-            trace!("synchronization response: {:?}", res);
-
-            Loop::Continue(())
-        })
-    });
+    #[async]
+    for event in client.sync(None, None, false).map_err(|e| {
+        error!("Error in sync_events: {:?}", e);
+    }) {
+        trace!("synchronization response: {:?}", event);
+    }
 
     unreachable!()
 }
@@ -209,35 +197,33 @@ fn bg_main(
                     let _ = sync_cancel_chan_tx.send(());
                 }
             },
-            MatrixCommand::UserSpecificCommand { user_id, command } => {
-                match user_data_map.get(&user_id) {
-                    Some(user_data) => match command {
-                        UserSpecificCommand::FetchDirectory => {
-                            tokio_handle.spawn(fetch_directory(
-                                user_data.clone(),
-                                frontend_chan_tx.clone(),
-                            ));
-                        }
-                        UserSpecificCommand::SendTextMessage {
+            MatrixCommand::UserSpecificCommand { user_id, command } => match user_data_map
+                .get(&user_id)
+            {
+                Some(user_data) => match command {
+                    UserSpecificCommand::FetchDirectory => {
+                        tokio_handle
+                            .spawn(fetch_directory(user_data.clone(), frontend_chan_tx.clone()));
+                    }
+                    UserSpecificCommand::SendTextMessage {
+                        room_id,
+                        message_content,
+                    } => {
+                        tokio_handle.spawn(send_text_message(
+                            user_data.clone(),
+                            frontend_chan_tx.clone(),
                             room_id,
                             message_content,
-                        } => {
-                            tokio_handle.spawn(send_text_message(
-                                user_data.clone(),
-                                frontend_chan_tx.clone(),
-                                room_id,
-                                message_content,
-                            ));
-                        }
-                    },
-                    None => {
-                        error!(
-                            "UserSpecificCommand requested for unknown user with user_id {}",
-                            user_id
-                        );
+                        ));
                     }
+                },
+                None => {
+                    error!(
+                        "UserSpecificCommand requested for unknown user with user_id {}",
+                        user_id
+                    );
                 }
-            }
+            },
             MatrixCommand::Quit => break,
         }
     }
