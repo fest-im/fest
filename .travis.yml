@@ -1,0 +1,10 @@
+language: rust
+dist: xenial
+rust:
+  - nightly
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libgtk-3-dev
+script:
+  - cargo +nightly build --verbose --all
+  - cargo +nightly test --verbose --all
