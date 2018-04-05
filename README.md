@@ -1,6 +1,6 @@
 # Fest ![Logo](/res/icons/hicolor/24x24/apps/fest.svg)
 
-[![TravisCI][https://api.travis-ci.org/LelCP/fest.svg?branch=master]][https://travis-ci.org/LelCP/fest] [![GitHub stars][badge]][repo]
+[![TravisCI](https://api.travis-ci.org/fest-im/fest.svg?branch=master)](https://travis-ci.org/fest-im/fest) [![GitHub stars][badge]][repo]
 
 [badge]: https://img.shields.io/github/stars/fest-im/fest.svg?style=social&label=Stars
 [repo]: https://github.com/fest-im/fest
