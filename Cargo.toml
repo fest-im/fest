@@ -23,15 +23,15 @@ features = ["v3_16"]
 version = "0.4.0"
 
 [dependencies.ruma-client]
-git = "https://github.com/jplatte/ruma-client.git"
+git = "https://github.com/fest-im/ruma-client.git"
 branch = "synapse-workarounds"
 
 [dependencies.ruma-events]
-git = "https://github.com/jplatte/ruma-events"
+git = "https://github.com/fest-im/ruma-events"
 branch = "synapse-workarounds"
 
 [dependencies.ruma-identifiers]
-git = "https://github.com/jplatte/ruma-identifiers.git"
+git = "https://github.com/fest-im/ruma-identifiers.git"
 branch = "synapse-workarounds"
 
 [features]
