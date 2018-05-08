@@ -10,7 +10,7 @@
     <section>
       <item>
         <attribute name="label">Keyboard Shortcuts</attribute>
-        <attribute name="action">app.shortcuts</attribute>
+        <attribute name="action">win.show-help-overlay</attribute>
       </item>
       <item>
         <attribute name="label">About</attribute>
