@@ -47,9 +47,10 @@ pub(super) fn connect(
         // Parts mentioning shortcuts here can be then removed
 
         act_shortcuts.connect_activate(clone!(app => move |_, _| {
-            let dialog: gtk::Window = gtk::Builder::new_from_resource("/org/fest-im/fest/gtk/help-overlay-old.ui")
-                .get_object("help_overlay_old")
-                .expect("Couldn't find help_overlay_old in ui file.");
+            let dialog: gtk::ShortcutsWindow =
+                gtk::Builder::new_from_resource("/org/fest-im/fest/gtk/help-overlay.ui")
+                    .get_object("help_overlay")
+                    .expect("Couldn't find help_overlay in ui file.");
 
             dialog.show();
         }));

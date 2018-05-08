@@ -4,6 +4,5 @@
     <file>main_window.glade</file>
     <file>gtk/menus.ui</file>
     <file>gtk/help-overlay.ui</file>
-    <file>gtk/help-overlay-old.ui</file>
   </gresource>
 </gresources>
