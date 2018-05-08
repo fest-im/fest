@@ -21,7 +21,7 @@ tokio-core = "0.1.17"
 url = "1.7.0"
 
 [dependencies.gtk]
-features = ["v3_16"]
+features = ["v3_22_26"]
 version = "0.4.1"
 
 [dependencies.ruma-client]
