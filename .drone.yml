@@ -1,0 +1,8 @@
+pipeline:
+  build:
+    image: docker.io/fedora:rawhide
+    commands:
+      - echo "TODO: Install dependencies"
+      - curl https://sh.rustup.rs -sSf | sh -s -- -y
+      - cargo +nightly build --verbose --all
+      - cargo +nightly test --verbose --all
