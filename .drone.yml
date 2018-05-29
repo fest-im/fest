@@ -2,4 +2,4 @@ pipeline:
   build:
     image: docker.io/fedora:rawhide
     commands:
-      - curl -v https://sh.rustup.rs
+      - dig sh.rustup.rs
