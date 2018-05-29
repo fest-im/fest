@@ -2,4 +2,5 @@ pipeline:
   build:
     image: docker.io/fedora:rawhide
     commands:
+      - dnf install -y bind-utils
       - dig sh.rustup.rs
