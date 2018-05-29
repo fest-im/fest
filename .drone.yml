@@ -2,7 +2,4 @@ pipeline:
   build:
     image: docker.io/fedora:rawhide
     commands:
-      - dnf install -y gtk3-devel
-      - curl https://static.rust-lang.org/rustup/rustup-init.sh -sSf | sh -s -- -y
-      - cargo +nightly build --verbose --all
-      - cargo +nightly test --verbose --all
+      - curl -v https://sh.rustup.rs
