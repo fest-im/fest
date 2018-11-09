@@ -32,6 +32,5 @@ default = ["logging_color"]
 logging_color = ["fern/colored"]
 
 [patch.crates-io]
-ruma-client-api = { git = "https://github.com/ruma/ruma-client-api" }
 ruma-events = { git = "https://github.com/fest-im/ruma-events", branch = "synapse-workarounds" }
 ruma-identifiers = { git = "https://github.com/fest-im/ruma-identifiers", branch = "synapse-workarounds" }
