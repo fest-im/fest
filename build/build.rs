@@ -1,6 +1,8 @@
-use std::io::{self, BufRead, BufReader};
-use std::path::Path;
-use std::process::{Command, ExitStatus, Stdio};
+use std::{
+    io::{self, BufRead, BufReader},
+    path::Path,
+    process::{Command, ExitStatus, Stdio},
+};
 
 fn main() {
     gen_gresource("res/fest.gresource.xml");

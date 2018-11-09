@@ -37,7 +37,8 @@ pub(crate) fn set_up_logging() {
         .level_for("fest", log::LevelFilter::Trace)
         // output to stdout
         .chain(::std::io::stdout())
-        .apply().unwrap();
+        .apply()
+        .unwrap();
 
     debug!("finished setting up logging! yay!");
     trace!("*tap* *tap* is this thing on? test test");

@@ -1,15 +1,17 @@
-use std;
-use std::cell::RefCell;
-use std::collections::hash_map::{Entry as HashMapEntry, HashMap};
-use std::rc::Rc;
+use std::{
+    self,
+    cell::RefCell,
+    collections::hash_map::{Entry as HashMapEntry, HashMap},
+    rc::Rc,
+};
 
 use futures::{self, prelude::*};
 use hyper::client::HttpConnector;
 use hyper_tls::HttpsConnector;
 use ruma_client::{self, api::r0};
 use ruma_events::{
-    EventType,
     room::message::{MessageEventContent, MessageType, TextMessageEventContent},
+    EventType,
 };
 use ruma_identifiers::RoomId;
 use tokio_core;
@@ -128,10 +130,11 @@ fn send_text_message(
                 msgtype: MessageType::Text,
             }),
         }
-    )).map(|_| {})
-        .map_err(|e| {
-            error!("Sending a text message to {} failed: {:?}", room_id, e);
-        })
+    ))
+    .map(|_| {})
+    .map_err(|e| {
+        error!("Sending a text message to {} failed: {:?}", room_id, e);
+    })
 }
 
 // TODO: This function should have Result::Error = Error, but we currently never
