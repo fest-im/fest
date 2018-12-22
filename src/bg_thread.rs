@@ -5,7 +5,12 @@ use std::{
     rc::Rc,
 };
 
-use futures::{self, prelude::*};
+use futures::{
+    self,
+    prelude::{async, await},
+    Future,
+    Stream,
+};
 use hyper::client::HttpConnector;
 use hyper_tls::HttpsConnector;
 use ruma_client::{self, api::r0};
@@ -71,7 +76,8 @@ fn sync(
 
     match connection_method {
         ConnectionMethod::Login { username, password } => {
-            await!(client.log_in(username.clone(), password)).map_err(|e| {
+            // TODO: Set the last param (device_id) to Some(_)
+            await!(client.log_in(username.clone(), password, None)).map_err(|e| {
                 error!("Failed to log in as {}: {:?}", username, e);
             })?;
         }
@@ -159,9 +165,7 @@ fn bg_main(
                 let (sync_cancel_chan_tx, sync_cancel_chan_rx) = futures::sync::oneshot::channel();
                 sync_cancel_chan_txs.insert(next_user_id, sync_cancel_chan_tx);
 
-                let client =
-                    ruma_client::Client::https(&tokio_handle, homeserver_url.clone(), None)
-                        .unwrap();
+                let client = ruma_client::Client::https(homeserver_url.clone(), None).unwrap();
 
                 let user_data = Rc::new(RefCell::new(UserData {
                     client,

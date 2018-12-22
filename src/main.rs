@@ -1,4 +1,4 @@
-#![feature(crate_in_paths, generators, proc_macro)]
+#![feature(generators)]
 
 extern crate futures_await as futures;
 extern crate gio;
