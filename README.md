@@ -18,7 +18,6 @@ details.
 
 The easiest way to install Rust nightly is with [rustup](https://www.rustup.rs):
 
-
 ```
 rustup install nightly
 ```
@@ -29,7 +28,6 @@ to compile Fest. You can install it using
 ```
 sudo apt install libgtk-3-dev
 ```
-
 
 ## How to Run
 
