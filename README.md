@@ -5,8 +5,12 @@
 [badge]: https://img.shields.io/github/stars/fest-im/fest.svg?style=social&label=Stars
 [repo]: https://github.com/fest-im/fest
 
-A GTK+ 3 [Matrix](https://matrix.org) chat client (work in progress). Right now,
-Fest is not functional!
+**Note: fest is not function and not currently in active development.**
+You might be interested in its fork [Fractal][] as an alternative.
+
+[Fractal]: https://gitlab.gnome.org/GNOME/fractal
+
+An in-progress GTK+ 3 [Matrix](https://matrix.org) chat client.
 
 Available under the terms of the GNU GPL version 3 or later. See `LICENSE` for
 details.
