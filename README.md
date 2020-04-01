@@ -5,7 +5,7 @@
 [badge]: https://img.shields.io/github/stars/fest-im/fest.svg?style=social&label=Stars
 [repo]: https://github.com/fest-im/fest
 
-**Note: fest is not function and not currently in active development.**
+**Note: fest is not function and not currently in active development.**  
 You might be interested in its fork [Fractal][] as an alternative.
 
 [Fractal]: https://gitlab.gnome.org/GNOME/fractal
